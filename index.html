@@ -1,0 +1,679 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CoordiCraft - Class XII NCERT Coordination Compounds Hub</title>
+  <meta name="description" content="Master coordination chemistry through interactive simulations, IUPAC nomenclature builders, ligand sorting games, and a 25-question NCERT-aligned quiz.">
+  <link rel="stylesheet" href="style.css">
+  <!-- Google Fonts for modern sleek UI look -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+</head>
+<body>
+  <div class="app-container">
+    <!-- Sidebar Navigation -->
+    <aside class="sidebar">
+      <div class="logo-container">
+        <div class="logo-icon">💠</div>
+        <div class="logo-text">CoordiCraft</div>
+      </div>
+      
+      <nav>
+        <ul class="nav-menu">
+          <li class="nav-item">
+            <div class="nav-link active" data-tab="dashboard" id="nav-dashboard">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="9" rx="1"/><rect x="14" y="3" width="7" height="5" rx="1"/><rect x="14" y="12" width="7" height="9" rx="1"/><rect x="3" y="16" width="7" height="5" rx="1"/></svg>
+              <span>Core Concepts</span>
+            </div>
+          </li>
+          <li class="nav-item">
+            <div class="nav-link" data-tab="nomenclature" id="nav-nomenclature">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9M3 20v-8a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v8M3 10V6a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v4M13 14V6a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v8"/></svg>
+              <span>Nomenclature Builder</span>
+            </div>
+          </li>
+          <li class="nav-item">
+            <div class="nav-link" data-tab="cft-lab" id="nav-cft-lab">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M8 12h8M12 8v8"/></svg>
+              <span>Crystal Field Lab</span>
+            </div>
+          </li>
+          <li class="nav-item">
+            <div class="nav-link" data-tab="ligand-sorter" id="nav-ligand-sorter">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v18M3 12h18M6.5 6.5l11 11M6.5 17.5l11-11"/></svg>
+              <span>Ligand Sorter</span>
+            </div>
+          </li>
+          <li class="nav-item">
+            <div class="nav-link" data-tab="quiz" id="nav-quiz">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3L22 4M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+              <span>Mastery Quiz</span>
+            </div>
+          </li>
+        </ul>
+      </nav>
+      
+      <div class="sidebar-footer">
+        <div>Learning Status: <span class="badge active-badge">Active</span></div>
+        <div>Progress: <span id="sidebar-progress-percent">0%</span></div>
+        <div class="progress-bar-container">
+          <div class="progress-bar-fill" id="sidebar-progress-bar"></div>
+        </div>
+        <div>CoordiCraft v1.0</div>
+      </div>
+    </aside>
+
+    <!-- Main Content Area -->
+    <main class="main-content">
+      
+      <!-- ========================================== -->
+      <!-- 1. DASHBOARD / CORE CONCEPTS PANEL         -->
+      <!-- ========================================== -->
+      <section id="dashboard" class="tab-panel active">
+        <div class="glass-card welcome-banner">
+          <div class="banner-content">
+            <h1 class="welcome-title">Coordination <span>Complexes</span></h1>
+            <p class="panel-subtitle">An interactive learning journey covering NCERT Class XII Chemistry. Dive into Coordination compounds, isomerism, Valence Bond Theory, and Crystal Field split energies through simulations and games.</p>
+          </div>
+        </div>
+
+        <!-- Concept Navigation Tabs -->
+        <div class="concept-nav">
+          <button class="concept-btn active" data-concept="werner">Werner's & Double Salts</button>
+          <button class="concept-btn" data-concept="nomenclature-info">Nomenclature Rules</button>
+          <button class="concept-btn" data-concept="isomerism">Isomerism</button>
+          <button class="concept-btn" data-concept="vbt">VBT (Valence Bond Theory)</button>
+          <button class="concept-btn" data-concept="cft">CFT (Crystal Field Theory)</button>
+          <button class="concept-btn" data-concept="carbonyls">Metal Carbonyls & Apps</button>
+        </div>
+
+        <!-- Concept Contents -->
+        <div class="glass-card concept-card-container">
+          
+          <!-- Werner Content -->
+          <div class="concept-content active" id="concept-werner">
+            <h2>Werner's Theory & Double Salts</h2>
+            <div class="concept-grid">
+              <div class="info-block">
+                <h3>Double Salts vs Coordination Compounds</h3>
+                <p><strong>Double Salts</strong> (e.g., Mohr's Salt [FeSO<sub>4</sub>·(NH<sub>4</sub>)<sub>2</sub>SO<sub>4</sub>·6H<sub>2</sub>O], Carnallite) dissociate completely into simple ions when dissolved in water. They lose their identity in solution.</p>
+                <p><strong>Coordination Compounds</strong> (e.g., K<sub>4</sub>[Fe(CN)<sub>6</sub>]) do not dissociate completely. The complex ion [Fe(CN)<sub>6</sub>]<sup>4-</sup> remains intact and does not give tests for individual Fe<sup>2+</sup> or CN<sup>-</sup> ions.</p>
+              </div>
+              <div class="info-block">
+                <h3>Werner's Postulates</h3>
+                <ul>
+                  <li><strong>Primary Valency:</strong> Ionizable, corresponds to the oxidation state of the metal. Satisfied by negative ions. Represented by dotted lines.</li>
+                  <li><strong>Secondary Valency:</strong> Non-ionizable, corresponds to the coordination number (fixed for a metal). Satisfied by neutral molecules or negative ions. Represented by thick solid lines.</li>
+                </ul>
+                <div class="example-box">
+                  <strong>Example:</strong> CoCl<sub>3</sub>·6NH<sub>3</sub> forms [Co(NH<sub>3</sub>)<sub>6</sub>]Cl<sub>3</sub>. When treated with AgNO<sub>3</sub>, 3 moles of AgCl precipitate, meaning 3 Cl<sup>-</sup> ions are outside the coordination sphere (primary valencies).
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Nomenclature Info Content -->
+          <div class="concept-content" id="concept-nomenclature-info">
+            <h2>Nomenclature Rules (IUPAC)</h2>
+            <div class="concept-grid">
+              <div class="info-block">
+                <h3>Key Rules for Naming</h3>
+                <ol>
+                  <li><strong>Order of Naming:</strong> Cation is named first, followed by the anion, regardless of whether they are complex or simple.</li>
+                  <li><strong>Naming Coordination Sphere:</strong> Ligands are named first in alphabetical order, followed by the central metal atom.</li>
+                  <li><strong>Ligand Prefixes:</strong> Use <em>di-, tri-, tetra-, penta-, hexa-</em> for simple ligands. Use <em>bis-, tris-, tetrakis-</em> for complex ligands containing prefixes (e.g., ethylenediamine).</li>
+                  <li><strong>Ligand Names:</strong> Anionic ligands end in <strong>-o</strong> (e.g., chloride &rarr; chlorido, cyanide &rarr; cyanido). Neutral ligands use special names (e.g., H<sub>2</sub>O &rarr; aqua, NH<sub>3</sub> &rarr; ammine, CO &rarr; carbonyl).</li>
+                </ol>
+              </div>
+              <div class="info-block">
+                <h3>Naming the Central Metal</h3>
+                <ul>
+                  <li>If the coordination entity is a <strong>cation</strong> or <strong>neutral</strong>, the metal is named as is (e.g., Cobalt, Platinum) followed by its oxidation state in Roman numerals in parentheses.</li>
+                  <li>If the coordination entity is an <strong>anion</strong>, the metal name ends in <strong>-ate</strong> (e.g., Cobalt &rarr; cobaltate, Iron &rarr; ferrate, Copper &rarr; cuprate, Silver &rarr; argentate).</li>
+                </ul>
+                <div class="example-box">
+                  <strong>Examples:</strong><br>
+                  • [Co(NH<sub>3</sub>)<sub>6</sub>]Cl<sub>3</sub> &rarr; Hexaamminecobalt(III) chloride<br>
+                  • K<sub>4</sub>[Fe(CN)<sub>6</sub>] &rarr; Potassium hexacyanidoferrate(II)
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Isomerism Content -->
+          <div class="concept-content" id="concept-isomerism">
+            <h2>Isomerism in Coordination Compounds</h2>
+            <div class="concept-grid">
+              <div class="info-block">
+                <h3>Structural Isomerism</h3>
+                <ul>
+                  <li><strong>Linkage Isomerism:</strong> Occurs in complexes with ambidentate ligands (e.g., [Co(NH<sub>3</sub>)<sub>5</sub>(NO<sub>2</sub>)]Cl<sub>2</sub> [nitro, red] vs [Co(NH<sub>3</sub>)<sub>5</sub>(ONO)]Cl<sub>2</sub> [nitrito, yellow]).</li>
+                  <li><strong>Coordination Isomerism:</strong> Interchange of ligands between cationic and anionic entities (e.g., [Co(NH<sub>3</sub>)<sub>6</sub>][Cr(CN)<sub>6</sub>] and [Cr(NH<sub>3</sub>)<sub>6</sub>][Co(CN)<sub>6</sub>]).</li>
+                  <li><strong>Ionisation Isomerism:</strong> Gives different ions in solution (e.g., [Co(NH<sub>3</sub>)<sub>5</sub>SO<sub>4</sub>]Br [red-violet, gives BaSO<sub>4</sub> negative, AgBr positive] vs [Co(NH<sub>3</sub>)<sub>5</sub>Br]SO<sub>4</sub> [red, gives BaSO<sub>4</sub> precipitate]).</li>
+                  <li><strong>Solvate / Hydrate Isomerism:</strong> Differs by whether water is inside or outside the coordination sphere (e.g., [Cr(H<sub>2</sub>O)<sub>6</sub>]Cl<sub>3</sub> [violet] vs [Cr(H<sub>2</sub>O)<sub>5</sub>Cl]Cl<sub>2</sub>·H<sub>2</sub>O [grey-green]).</li>
+                </ul>
+              </div>
+              <div class="info-block">
+                <h3>Stereoisomerism</h3>
+                <p><strong>Geometrical Isomerism:</strong> Common in coordination numbers 4 (square planar only, e.g. cis/trans [Pt(NH<sub>3</sub>)<sub>2</sub>Cl<sub>2</sub>]) and 6 (octahedral, e.g. cis/trans [Co(NH<sub>3</sub>)<sub>4</sub>Cl<sub>2</sub>]<sup>+</sup>, and fac/mer [Co(NH<sub>3</sub>)<sub>3</sub>(NO<sub>2</sub>)<sub>3</sub>]). Tetrahedral complexes do not show geometrical isomerism due to relative positions being adjacent.</p>
+                <p><strong>Optical Isomerism:</strong> Non-superimposable mirror images (chiral). Common in octahedral complexes with bidentate ligands (e.g., [Co(en)<sub>3</sub>]<sup>3+</sup> or cis-[Co(en)<sub>2</sub>Cl<sub>2</sub>]<sup>+</sup>). The trans isomer is symmetrical (has plane of symmetry) and optically inactive.</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- VBT Content -->
+          <div class="concept-content" id="concept-vbt">
+            <h2>Valence Bond Theory (VBT)</h2>
+            <div class="concept-grid">
+              <div class="info-block">
+                <h3>Core Assumptions</h3>
+                <p>VBT explains bonding in terms of hybridization of metal orbitals. The metal provides empty orbitals to accept lone pairs from ligands.</p>
+                <table>
+                  <thead>
+                    <tr>
+                      <th>C.N.</th>
+                      <th>Geometry</th>
+                      <th>Hybridization</th>
+                      <th>Examples</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td>4</td>
+                      <td>Tetrahedral</td>
+                      <td>sp<sub>3</sub></td>
+                      <td>[Ni(CO)<sub>4</sub>], [Ni(Cl)<sub>4</sub>]<sup>2-</sup></td>
+                    </tr>
+                    <tr>
+                      <td>4</td>
+                      <td>Square Planar</td>
+                      <td>dsp<sub>2</sub></td>
+                      <td>[Ni(CN)<sub>4</sub>]<sup>2-</sup>, [Pt(Cl)<sub>4</sub>]<sup>2-</sup></td>
+                    </tr>
+                    <tr>
+                      <td>6</td>
+                      <td>Octahedral (Inner)</td>
+                      <td>d<sup>2</sup>sp<sub>3</sub></td>
+                      <td>[Fe(CN)<sub>6</sub>]<sup>4-</sup>, [Co(NH<sub>3</sub>)<sub>6</sub>]<sup>3+</sup></td>
+                    </tr>
+                    <tr>
+                      <td>6</td>
+                      <td>Octahedral (Outer)</td>
+                      <td>sp<sub>3</sub>d<sup>2</sup></td>
+                      <td>[CoF<sub>6</sub>]<sup>3-</sup>, [Fe(H<sub>2</sub>O)<sub>6</sub>]<sup>2+</sup></td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+              <div class="info-block">
+                <h3>Inner vs. Outer Orbital Complexes</h3>
+                <ul>
+                  <li><strong>Inner Orbital Complexes (Low Spin):</strong> Formed when strong field ligands force d-electrons to pair up, leaving inner (n-1)d orbitals free for hybridization (e.g., d<sup>2</sup>sp<sub>3</sub>). Usually diamagnetic or low spin.</li>
+                  <li><strong>Outer Orbital Complexes (High Spin):</strong> Formed when weak field ligands cannot force pairing. Outer nd orbitals are used for hybridization (e.g., sp<sub>3</sub>d<sup>2</sup>). Usually paramagnetic or high spin.</li>
+                </ul>
+                <div class="example-box">
+                  <strong>Magnetic Moment (&mu;):</strong> Calculated using the spin-only formula: &mu; = &radic;[n(n+2)] Bohr Magnetons (BM), where n = number of unpaired electrons.
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- CFT Content -->
+          <div class="concept-content" id="concept-cft">
+            <h2>Crystal Field Theory (CFT)</h2>
+            <div class="concept-grid">
+              <div class="info-block">
+                <h3>The Electrostatic Model</h3>
+                <p>CFT treats the metal-ligand bond as purely ionic, resulting from electrostatic attractions. The approach of negative ligand point charges splits the degenerate d-orbitals of the metal ion into sets with different energies.</p>
+                <h4>Octahedral Field Splitting (&Delta;<sub>o</sub>)</h4>
+                <p>Orbitals pointing along the axes (d<sub>x<sup>2</sup>-y<sup>2</sup></sub>, d<sub>z<sup>2</sup></sub>) experience more repulsion and rise in energy to form the <strong>e<sub>g</sub></strong> set. Orbitals pointing between the axes (d<sub>xy</sub>, d<sub>yz</sub>, d<sub>xz</sub>) experience less repulsion and fall in energy to form the <strong>t<sub>2g</sub></strong> set. The gap is &Delta;<sub>o</sub>.</p>
+                <h4>Tetrahedral Field Splitting (&Delta;<sub>t</sub>)</h4>
+                <p>The splitting is inverted: <strong>t<sub>2</sub></strong> (higher) and <strong>e</sub></strong> (lower). The splitting energy is smaller: &Delta;<sub>t</sub> = (4/9) &Delta;<sub>o</sub>. Thus, tetrahedral complexes are almost always high spin.</p>
+              </div>
+              <div class="info-block">
+                <h3>Spectrochemical Series & Color</h3>
+                <p>Ligands are arranged in order of increasing field strength:</p>
+                <div class="series-box">
+                  I<sup>-</sup> &lt; Br<sup>-</sup> &lt; S<sup>2-</sup> &lt; SCN<sup>-</sup> &lt; Cl<sup>-</sup> &lt; F<sup>-</sup> &lt; OH<sup>-</sup> &lt; C<sub>2</sub>O<sub>4</sub><sup>2-</sup> &lt; H<sub>2</sub>O &lt; NCS<sup>-</sup> &lt; EDTA<sup>4-</sup> &lt; NH<sub>3</sub> &lt; en &lt; CN<sup>-</sup> &lt; CO
+                </div>
+                <ul>
+                  <li><strong>Strong Field (e.g., CN<sup>-</sup>, CO):</strong> &Delta;<sub>o</sub> &gt; P (pairing energy). Electrons pair in t<sub>2g</sub> before entering e<sub>g</sub> (low spin).</li>
+                  <li><strong>Weak Field (e.g., F<sup>-</sup>, Cl<sup>-</sup>):</strong> &Delta;<sub>o</sub> &lt; P. Electrons fill orbitals singly before pairing (high spin).</li>
+                </ul>
+                <p><strong>Color:</strong> Light absorption promotes an electron from t<sub>2g</sub> to e<sub>g</sub> (d-d transition). The observed color is complementary to the absorbed wavelength.</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Carbonyls Content -->
+          <div class="concept-content" id="concept-carbonyls">
+            <h2>Metal Carbonyls & Applications</h2>
+            <div class="concept-grid">
+              <div class="info-block">
+                <h3>Bonding in Metal Carbonyls</h3>
+                <p>Metal carbonyls (e.g., [Ni(CO)<sub>4</sub>], [Fe(CO)<sub>5</sub>], [Cr(CO)<sub>6</sub>]) feature <strong>synergic bonding</strong>:</p>
+                <ol>
+                  <li><strong>&sigma; Bond:</strong> Ligand CO donates its lone pair of electrons from carbon to an empty d-orbital of the metal.</li>
+                  <li><strong>&pi; Back-donation:</strong> Filled d-orbital of the metal back-donates electrons into the empty anti-bonding &pi;* molecular orbital of CO.</li>
+                </ol>
+                <p>This feedback mechanism strengthens both the M-C bond and weakens the C-O bond, providing high stability to carbonyls.</p>
+              </div>
+              <div class="info-block">
+                <h3>Applications of Coordination Compounds</h3>
+                <ul>
+                  <li><strong>In Medicine:</strong> <em>Cisplatin</em> (cis-[Pt(NH<sub>3</sub>)<sub>2</sub>Cl<sub>2</sub>]) is used in cancer chemotherapy. <em>EDTA</em> is used in treatment of lead poisoning.</li>
+                  <li><strong>In Biology:</strong> Chlorophyll contains Mg<sup>2+</sup>, Hemoglobin contains Fe<sup>2+</sup>, and Vitamin B12 contains Co<sup>3+</sup>.</li>
+                  <li><strong>In Metallurgy:</strong> Extraction of silver and gold involves forming soluble cyano-complexes (e.g., [Au(CN)<sub>2</sub>]<sup>-</sup>).</li>
+                  <li><strong>In Qualitative Analysis:</strong> Detection of Ni<sup>2+</sup> using dimethylglyoxime (DMG) forming a rosy red complex.</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </section>
+
+      <!-- ========================================== -->
+      <!-- 2. NOMENCLATURE BUILDER PANEL              -->
+      <!-- ========================================== -->
+      <section id="nomenclature" class="tab-panel">
+        <div class="glass-card game-header">
+          <h2>IUPAC Nomenclature Builder</h2>
+          <p>Assemble the IUPAC name for the given coordination complex by selecting the name parts in the correct order. Keep an eye on the complex charge and metal ending!</p>
+          <div class="game-stats">
+            <div>Score: <span id="nom-score" class="stat-highlight">0</span></div>
+            <div>Streak: <span id="nom-streak" class="stat-highlight">0</span></div>
+            <div>Lives: <span id="nom-lives">❤️❤️❤️</span></div>
+          </div>
+        </div>
+
+        <div class="game-area">
+          <div class="glass-card formula-display-card">
+            <span class="formula-label">Coordination Complex:</span>
+            <div id="nom-formula" class="formula-text">[Co(NH<sub>3</sub>)<sub>6</sub>]Cl<sub>3</sub></div>
+          </div>
+
+          <div class="glass-card construction-card">
+            <h3>Your Assembled Name:</h3>
+            <div id="assembled-name-container" class="assembled-name-placeholder">
+              Click elements below to assemble the name...
+            </div>
+            <div class="action-buttons">
+              <button id="nom-clear-btn" class="secondary-btn">Clear</button>
+              <button id="nom-submit-btn" class="primary-btn">Submit Answer</button>
+              <button id="nom-skip-btn" class="secondary-btn">Skip</button>
+            </div>
+          </div>
+
+          <div class="glass-card options-card">
+            <h3>Available Nomenclature Cards:</h3>
+            <div id="nom-cards-container" class="cards-grid">
+              <!-- Name parts loaded dynamically -->
+            </div>
+          </div>
+        </div>
+
+        <!-- Result overlay modal for explanation -->
+        <div id="nom-feedback-modal" class="modal hidden">
+          <div class="modal-content glass-card">
+            <h3 id="nom-modal-title">Correct!</h3>
+            <div id="nom-modal-body">
+              Explanation goes here.
+            </div>
+            <button id="nom-modal-close" class="primary-btn">Next Complex</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- ========================================== -->
+      <!-- 3. CRYSTAL FIELD LAB PANEL                 -->
+      <!-- ========================================== -->
+      <section id="cft-lab" class="tab-panel">
+        <div class="glass-card game-header">
+          <h2>Crystal Field Lab & Simulator</h2>
+          <p>Explore Crystal Field Theory (CFT) in real-time. Choose a metal ion, coordination geometry, and ligand. Watch the d-orbitals split, electrons fill based on ligand field strength, and see the resulting magnetic properties and predicted color!</p>
+        </div>
+
+        <div class="lab-layout">
+          <!-- Controls Column -->
+          <div class="glass-card lab-controls">
+            <h3>Lab Settings</h3>
+            
+            <div class="control-group">
+              <label for="lab-metal">Central Metal Ion:</label>
+              <select id="lab-metal">
+                <option value="Ti3">Ti³⁺ (d¹)</option>
+                <option value="V3">V³⁺ (d²)</option>
+                <option value="Cr3">Cr³⁺ (d³)</option>
+                <option value="Mn3">Mn³⁺ (d⁴)</option>
+                <option value="Fe3">Fe³⁺ (d⁵)</option>
+                <option value="Fe2" selected>Fe²⁺ (d⁶)</option>
+                <option value="Co3">Co³⁺ (d⁶)</option>
+                <option value="Co2">Co²⁺ (d⁷)</option>
+                <option value="Ni2">Ni²⁺ (d⁸)</option>
+                <option value="Cu2">Cu²⁺ (d⁹)</option>
+                <option value="Zn2">Zn²⁺ (d¹⁰)</option>
+              </select>
+            </div>
+
+            <div class="control-group">
+              <label>Geometry:</label>
+              <div class="radio-toggle">
+                <input type="radio" id="geom-oct" name="lab-geometry" value="octahedral" checked>
+                <label for="geom-oct">Octahedral (C.N. = 6)</label>
+                
+                <input type="radio" id="geom-tet" name="lab-geometry" value="tetrahedral">
+                <label for="geom-tet">Tetrahedral (C.N. = 4)</label>
+              </div>
+            </div>
+
+            <div class="control-group">
+              <label for="lab-ligand">Ligand (Spectrochemical Series):</label>
+              <select id="lab-ligand">
+                <option value="I">I⁻ (Very Weak Field)</option>
+                <option value="Cl">Cl⁻ (Weak Field)</option>
+                <option value="F">F⁻ (Weak Field)</option>
+                <option value="H2O">H₂O (Weak Field - Borderline)</option>
+                <option value="NH3" selected>NH₃ (Strong Field)</option>
+                <option value="en">ethylenediamine (en) (Strong Field)</option>
+                <option value="CN">CN⁻ (Very Strong Field)</option>
+                <option value="CO">CO (Synergic - Extremely Strong)</option>
+              </select>
+            </div>
+
+            <div class="ligand-indicator glass-card">
+              <span class="label">Field Strength:</span>
+              <span id="field-strength-badge" class="badge sfl-badge">Strong Field Ligand (SFL)</span>
+              <p id="field-relation" class="small-text">Δₒ > P (Pairing Energy). Low Spin complex will form.</p>
+            </div>
+            
+            <div class="series-visual">
+              <h4>Spectrochemical Slider</h4>
+              <input type="range" id="series-slider" min="0" max="7" value="4">
+              <div class="slider-labels">
+                <span>I⁻ (Weak)</span>
+                <span>CO (Strong)</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Splitting Visualization Column -->
+          <div class="glass-card lab-visualization">
+            <h3>d-Orbital Splitting Diagram</h3>
+            <div class="diagram-container">
+              
+              <!-- Octahedral Display -->
+              <div id="octahedral-diagram" class="splitting-diagram active">
+                <div class="energy-axis">
+                  <div class="axis-arrow">▲</div>
+                  <div class="axis-label">Energy</div>
+                </div>
+
+                <!-- eg orbitals (higher) -->
+                <div class="level-container eg-level">
+                  <span class="level-lbl">e<sub>g</sub> (d<sub>x²-y²</sub>, d<sub>z²</sub>)</span>
+                  <div class="orbital-boxes">
+                    <div class="orbital-box" id="oct-eg-1"><div class="spin-electron up hidden">▲</div><div class="spin-electron down hidden">▼</div></div>
+                    <div class="orbital-box" id="oct-eg-2"><div class="spin-electron up hidden">▲</div><div class="spin-electron down hidden">▼</div></div>
+                  </div>
+                  <div class="energy-offset">+0.6 Δₒ</div>
+                </div>
+
+                <!-- Delta O Indicator -->
+                <div class="delta-gap">
+                  <div class="gap-arrow-up">▲</div>
+                  <div class="gap-label">Δ<sub>o</sub> (Splitting Energy)</div>
+                  <div class="gap-arrow-down">▼</div>
+                </div>
+
+                <!-- Barycenter -->
+                <div class="barycenter-line">
+                  <span>Barycenter (Average Energy)</span>
+                </div>
+
+                <!-- t2g orbitals (lower) -->
+                <div class="level-container t2g-level">
+                  <span class="level-lbl">t<sub>2g</sub> (d<sub>xy</sub>, d<sub>yz</sub>, d<sub>xz</sub>)</span>
+                  <div class="orbital-boxes">
+                    <div class="orbital-box" id="oct-t2g-1"><div class="spin-electron up hidden">▲</div><div class="spin-electron down hidden">▼</div></div>
+                    <div class="orbital-box" id="oct-t2g-2"><div class="spin-electron up hidden">▲</div><div class="spin-electron down hidden">▼</div></div>
+                    <div class="orbital-box" id="oct-t2g-3"><div class="spin-electron up hidden">▲</div><div class="spin-electron down hidden">▼</div></div>
+                  </div>
+                  <div class="energy-offset">-0.4 Δₒ</div>
+                </div>
+              </div>
+
+              <!-- Tetrahedral Display (Initially Hidden) -->
+              <div id="tetrahedral-diagram" class="splitting-diagram">
+                <div class="energy-axis">
+                  <div class="axis-arrow">▲</div>
+                  <div class="axis-label">Energy</div>
+                </div>
+
+                <!-- t2 orbitals (higher) -->
+                <div class="level-container t2-level">
+                  <span class="level-lbl">t<sub>2</sub> (d<sub>xy</sub>, d<sub>yz</sub>, d<sub>xz</sub>)</span>
+                  <div class="orbital-boxes">
+                    <div class="orbital-box" id="tet-t2-1"><div class="spin-electron up hidden">▲</div><div class="spin-electron down hidden">▼</div></div>
+                    <div class="orbital-box" id="tet-t2-2"><div class="spin-electron up hidden">▲</div><div class="spin-electron down hidden">▼</div></div>
+                    <div class="orbital-box" id="tet-t2-3"><div class="spin-electron up hidden">▲</div><div class="spin-electron down hidden">▼</div></div>
+                  </div>
+                  <div class="energy-offset">+0.4 Δ<sub>t</sub></div>
+                </div>
+
+                <!-- Delta T Indicator -->
+                <div class="delta-gap">
+                  <div class="gap-arrow-up">▲</div>
+                  <div class="gap-label">Δ<sub>t</sub> ≈ 4/9 Δ<sub>o</sub></div>
+                  <div class="gap-arrow-down">▼</div>
+                </div>
+
+                <!-- Barycenter -->
+                <div class="barycenter-line">
+                  <span>Barycenter</span>
+                </div>
+
+                <!-- e orbitals (lower) -->
+                <div class="level-container e-level">
+                  <span class="level-lbl">e (d<sub>x²-y²</sub>, d<sub>z²</sub>)</span>
+                  <div class="orbital-boxes">
+                    <div class="orbital-box" id="tet-e-1"><div class="spin-electron up hidden">▲</div><div class="spin-electron down hidden">▼</div></div>
+                    <div class="orbital-box" id="tet-e-2"><div class="spin-electron up hidden">▲</div><div class="spin-electron down hidden">▼</div></div>
+                  </div>
+                  <div class="energy-offset">-0.6 Δ<sub>t</sub></div>
+                </div>
+              </div>
+
+            </div>
+          </div>
+
+          <!-- Lab Results Column -->
+          <div class="glass-card lab-results">
+            <h3>Calculated Properties</h3>
+            
+            <div class="result-item">
+              <span class="result-label">Electron Configuration:</span>
+              <span id="res-config" class="result-val code-font">t₂g⁶ eg⁰</span>
+            </div>
+
+            <div class="result-item">
+              <span class="result-label">Spin State:</span>
+              <span id="res-spin" class="result-val">Low Spin Complex</span>
+            </div>
+
+            <div class="result-item">
+              <span class="result-label">Unpaired Electrons (n):</span>
+              <span id="res-unpaired" class="result-val">0</span>
+            </div>
+
+            <div class="result-item">
+              <span class="result-label">Magnetic Moment (μ):</span>
+              <span id="res-magnetic" class="result-val">0.00 BM (Diamagnetic)</span>
+            </div>
+
+            <div class="result-item color-result">
+              <div class="color-details">
+                <span class="result-label">Estimated Color:</span>
+                <span id="res-color-name" class="result-val">Orange-Yellow</span>
+                <span id="res-absorb" class="small-text">Absorbs: Violet-Blue (~450 nm)</span>
+              </div>
+              <div id="color-preview-patch" class="color-patch"></div>
+            </div>
+
+            <div class="formula-output glass-card">
+              <h4>Representative Complex:</h4>
+              <div id="res-formula" class="code-font">[Fe(NH₃)₆]²⁺</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ========================================== -->
+      <!-- 4. LIGAND SORTER PANEL                     -->
+      <!-- ========================================== -->
+      <section id="ligand-sorter" class="tab-panel">
+        <div class="glass-card game-header">
+          <h2>Ligand Sorter Game</h2>
+          <p>Classify the incoming ligand cards into the correct chemical categories based on their denticity and ambidentate nature. Be quick and precise!</p>
+          <div class="game-stats">
+            <div>Score: <span id="sort-score" class="stat-highlight">0</span></div>
+            <div>High Score: <span id="sort-highscore" class="stat-highlight">0</span></div>
+            <div>Time Left: <span id="sort-timer" class="stat-highlight">45s</span></div>
+          </div>
+        </div>
+
+        <div class="sorter-game-container">
+          <!-- Game Play Area -->
+          <div id="sorter-active-screen" class="sorter-play-area">
+            <!-- Active Card Container -->
+            <div class="active-card-wrapper">
+              <div id="ligand-card" class="ligand-card-element">
+                <div class="ligand-symbol" id="card-symbol">en</div>
+                <div class="ligand-name" id="card-name">ethylenediamine</div>
+                <div class="ligand-hint">Click the correct bucket below!</div>
+              </div>
+            </div>
+
+            <!-- Buckets Grid -->
+            <div class="buckets-grid">
+              <button class="bucket-btn" data-category="monodentate">
+                <div class="bucket-icon">💧</div>
+                <div class="bucket-title">Monodentate</div>
+                <div class="bucket-desc">1 Donor Atom (e.g. Cl⁻, NH₃)</div>
+              </button>
+              
+              <button class="bucket-btn" data-category="bidentate">
+                <div class="bucket-icon">🦀</div>
+                <div class="bucket-title">Bidentate</div>
+                <div class="bucket-desc">2 Donor Atoms (e.g. en, ox²⁻)</div>
+              </button>
+
+              <button class="bucket-btn" data-category="polydentate">
+                <div class="bucket-icon">🐙</div>
+                <div class="bucket-title">Polydentate</div>
+                <div class="bucket-desc">&gt;2 Donor Atoms (e.g. EDTA⁴⁻)</div>
+              </button>
+
+              <button class="bucket-btn" data-category="ambidentate">
+                <div class="bucket-icon">🎭</div>
+                <div class="bucket-title">Ambidentate</div>
+                <div class="bucket-desc">Can coordinate via 2 different atoms (e.g. SCN⁻)</div>
+              </button>
+            </div>
+          </div>
+
+          <!-- Start/Over Screen -->
+          <div id="sorter-start-screen" class="glass-card sorter-overlay-card">
+            <h3>Are you ready to classify?</h3>
+            <p>You have 45 seconds to sort as many ligands as possible. Incorrect placements deduct 2 seconds from the clock.</p>
+            <button id="sorter-start-btn" class="primary-btn btn-large">Start Sorting Game</button>
+          </div>
+
+          <div id="sorter-end-screen" class="glass-card sorter-overlay-card hidden">
+            <h3>Time's Up!</h3>
+            <p>You sorted <strong id="final-sorted-count">0</strong> ligands successfully.</p>
+            <p>Accuracy: <strong id="sort-accuracy">0%</strong></p>
+            <button id="sorter-restart-btn" class="primary-btn btn-large">Play Again</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- ========================================== -->
+      <!-- 5. 25-QUESTION MASTERY QUIZ PANEL          -->
+      <!-- ========================================== -->
+      <section id="quiz" class="tab-panel">
+        <div class="glass-card game-header">
+          <h2>NCERT Class XII Mastery Quiz</h2>
+          <p>Test your knowledge with exactly 25 multiple-choice questions covering double salts, Werner's postulates, nomenclature, isomerism, VBT, CFT, metal carbonyls, and applications.</p>
+          <div class="quiz-progress-info">
+            <div>Question <span id="quiz-q-num">1</span> of 25</div>
+            <div>Score: <span id="quiz-score">0</span>/25</div>
+          </div>
+          <div class="quiz-progress-bar-container">
+            <div class="quiz-progress-bar-fill" id="quiz-progress-bar"></div>
+          </div>
+        </div>
+
+        <div class="quiz-container">
+          <!-- Question Card -->
+          <div class="glass-card question-card" id="quiz-question-screen">
+            <div id="question-text" class="question-title">
+              What is the hybridization and magnetic behavior of the complex [CoF₆]³⁻ according to Valence Bond Theory?
+            </div>
+            
+            <div class="options-container" id="quiz-options">
+              <button class="option-btn">A. d²sp³ and paramagnetic</button>
+              <button class="option-btn">B. sp³d² and paramagnetic</button>
+              <button class="option-btn">C. d²sp³ and diamagnetic</button>
+              <button class="option-btn">D. sp³d² and diamagnetic</button>
+            </div>
+
+            <!-- Feedback card initially hidden -->
+            <div id="quiz-feedback" class="quiz-feedback-box hidden">
+              <div class="feedback-status" id="feedback-status-text">Correct!</div>
+              <div class="feedback-explanation" id="feedback-explanation-text">
+                Explanation text goes here...
+              </div>
+              <button id="quiz-next-btn" class="primary-btn">Next Question</button>
+            </div>
+          </div>
+
+          <!-- Quiz Summary Card (Initially Hidden) -->
+          <div class="glass-card quiz-results-card hidden" id="quiz-summary-screen">
+            <div class="result-graphic">🏆</div>
+            <h2>Quiz Completed!</h2>
+            <div class="result-stats">
+              <div class="res-stat-item">
+                <span class="lbl">Final Score</span>
+                <span class="val" id="summary-score">18 / 25</span>
+              </div>
+              <div class="res-stat-item">
+                <span class="lbl">Accuracy</span>
+                <span class="val" id="summary-accuracy">72%</span>
+              </div>
+              <div class="res-stat-item">
+                <span class="lbl">Grade</span>
+                <span class="val" id="summary-grade">Excellent</span>
+              </div>
+            </div>
+
+            <div class="certificate-container glass-card">
+              <h3>Your Achievement Certificate</h3>
+              <p>You have demonstrated solid mastery of NCERT Class XII Coordination Compounds.</p>
+              <canvas id="certificate-canvas" width="600" height="400" style="display:none;"></canvas>
+              <img id="certificate-image" alt="Coordination Chemistry Certificate" class="cert-img">
+              <button id="download-cert-btn" class="primary-btn">Download Certificate</button>
+            </div>
+
+            <button id="quiz-restart-btn" class="secondary-btn btn-large">Retake Quiz</button>
+          </div>
+        </div>
+      </section>
+
+    </main>
+  </div>
+  <script src="app.js"></script>
+</body>
+</html>
