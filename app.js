@@ -1,5 +1,5 @@
 /* ==========================================================================
-   CoordiCraft - Class XII NCERT Coordination Compounds App Logic
+   SoluCraft - Class XII NCERT Solutions Chemistry Logic
    ========================================================================== */
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -9,37 +9,47 @@ document.addEventListener('DOMContentLoaded', () => {
   // ==========================================
   const progressState = {
     conceptsRead: {
-      werner: false,
-      "nomenclature-info": false,
-      isomerism: false,
-      vbt: false,
-      cft: false,
-      carbonyls: false
+      "sol-types": false,
+      "solubility": false,
+      "raoults-law": false,
+      "deviations": false,
+      "colligative": false,
+      "vanthoff": false
     },
-    nomenclatureStreakReached: false,
-    sorterHighScoreReached: false,
+    concentrationMixerUsed: false,
+    raoultsForcesAdjusted: false,
+    colligativeShiftsObserved: false,
     quizCompleted: false,
-    quizScore: 0
+    quizScore: 0,
+    studentName: ""
   };
 
   function updateOverallProgress() {
     let readCount = Object.values(progressState.conceptsRead).filter(Boolean).length;
-    let readPercentage = (readCount / 6) * 60; // 60% weight for reading concepts
+    let readPercentage = (readCount / 6) * 50; // 50% weight for reading concepts
     
-    let gamePercentage = 0;
-    if (progressState.nomenclatureStreakReached) gamePercentage += 10; // 10%
-    if (progressState.sorterHighScoreReached) gamePercentage += 10;     // 10%
+    let activityPercentage = 0;
+    if (progressState.concentrationMixerUsed) activityPercentage += 10;
+    if (progressState.raoultsForcesAdjusted) activityPercentage += 10;
+    if (progressState.colligativeShiftsObserved) activityPercentage += 10;
     if (progressState.quizCompleted) {
-      gamePercentage += 20; // 20% weight
+      activityPercentage += 20;
     }
 
-    const totalProgress = Math.round(readPercentage + gamePercentage);
+    const totalProgress = Math.round(readPercentage + activityPercentage);
     
     // Update DOM elements
     const percentText = document.getElementById('sidebar-progress-percent');
     const progressBar = document.getElementById('sidebar-progress-bar');
     if (percentText) percentText.innerText = totalProgress + '%';
     if (progressBar) progressBar.style.width = totalProgress + '%';
+  }
+
+  // MathJax safe trigger helper
+  function triggerMathJax() {
+    if (window.MathJax && window.MathJax.typesetPromise) {
+      window.MathJax.typesetPromise();
+    }
   }
 
   // ==========================================
@@ -52,11 +62,9 @@ document.addEventListener('DOMContentLoaded', () => {
     link.addEventListener('click', () => {
       const targetTab = link.getAttribute('data-tab');
       
-      // Update sidebar links active class
       sidebarLinks.forEach(l => l.classList.remove('active'));
       link.classList.add('active');
 
-      // Update visible tab panel
       tabPanels.forEach(panel => {
         panel.classList.remove('active');
         if (panel.getAttribute('id') === targetTab) {
@@ -64,10 +72,17 @@ document.addEventListener('DOMContentLoaded', () => {
         }
       });
 
-      // Special action: if entering ligand-sorter check if game reset is needed, or quiz
-      if (targetTab === 'ligand-sorter') {
-        resetSorterGameUI();
+      // Special action: restart/initialize animation loops for specific tabs
+      if (targetTab === 'concentration-lab') {
+        initBeakerCanvas();
+      } else if (targetTab === 'raoults-lab') {
+        drawRaoultGraph();
+      } else if (targetTab === 'colligative-lab') {
+        initColligativeVisualizers();
       }
+
+      // Re-typeset math elements
+      triggerMathJax();
     });
   });
 
@@ -78,7 +93,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const conceptContents = document.querySelectorAll('.concept-content');
 
   // Mark first concept as read on load
-  progressState.conceptsRead['werner'] = true;
+  progressState.conceptsRead['sol-types'] = true;
   updateOverallProgress();
 
   conceptBtns.forEach(btn => {
@@ -98,974 +113,1292 @@ document.addEventListener('DOMContentLoaded', () => {
       // Mark concept as read
       progressState.conceptsRead[conceptId] = true;
       updateOverallProgress();
+
+      // Re-typeset math elements
+      triggerMathJax();
     });
   });
 
-
   // ==========================================
-  // GAME 1: IUPAC NOMENCLATURE BUILDER
+  // VIRTUAL LAB 1: CONCENTRATION MIXER
   // ==========================================
-  const nomenclatureComplexes = [
-    {
-      formula: '[Co(NH₃)₆]Cl₃',
-      correctName: 'hexaamminecobalt(III) chloride',
-      parts: ['hexaammine', 'cobalt', '(III)', 'chloride'],
-      distractors: ['hexaamine', 'cobaltate', '(II)', 'trichloride'],
-      explanation: 'For [Co(NH₃)₆]Cl₃, the coordination sphere is cationic, so cobalt is named normally. NH₃ ligand is spelled "ammine" (with double m). The oxidation state of cobalt is +3 because 3 Cl⁻ outer-sphere anions balance the +3 charge. Thus: hexaamminecobalt(III) chloride.'
-    },
-    {
-      formula: 'K₄[Fe(CN)₆]',
-      correctName: 'potassium hexacyanidoferrate(II)',
-      parts: ['potassium', 'hexacyanidoferrate', '(II)'],
-      distractors: ['hexacyanidoiron', '(III)', 'ferrate', 'tetrapotassium'],
-      explanation: 'In K₄[Fe(CN)₆], the cation is Potassium (simple cation, named first without prefixes). The coordination sphere is an anion: [Fe(CN)₆]⁴⁻. Since it is anionic, the central metal iron ends in "-ate" (ferrate). The oxidation state is calculated as x + 6(-1) = -4 &rArr; x = +2. Thus: potassium hexacyanidoferrate(II).'
-    },
-    {
-      formula: '[Pt(NH₃)₂Cl(NO₂)]',
-      correctName: 'diamminechloridonitrito-N-platinum(II)',
-      parts: ['diammine', 'chlorido', 'nitrito-N-platinum', '(II)'],
-      distractors: ['platinate', '(IV)', 'nitro-N-platinum', 'nitrito-O-platinum'],
-      explanation: 'This is a neutral complex. Ligands are ordered alphabetically: ammine (NH₃) before chlorido (Cl⁻) before nitrito-N (NO₂⁻ coordinating via nitrogen). The central metal platinum is named normally since the complex is neutral. Oxidation state is +2. Thus: diamminechloridonitrito-N-platinum(II).'
-    },
-    {
-      formula: '[Co(en)₃]₂(SO₄)₃',
-      correctName: 'tris(ethane-1,2-diamine)cobalt(III) sulfate',
-      parts: ['tris(ethane-1,2-diamine)', 'cobalt', '(III)', 'sulfate'],
-      distractors: ['tri(ethylenediamine)', 'cobaltate', 'trisulfate', '(II)'],
-      explanation: 'The bidentate ligand "ethane-1,2-diamine" contains numerical prefixes, so we use the prefix "tris" instead of "tri". Cobalt is in its +3 oxidation state. Sulfate is outside the sphere. Thus: tris(ethane-1,2-diamine)cobalt(III) sulfate.'
-    },
-    {
-      formula: 'K₃[Al(C₂O₄)₃]',
-      correctName: 'potassium trioxalatoaluminate(III)',
-      parts: ['potassium', 'trioxalatoaluminate', '(III)'],
-      distractors: ['aluminum', 'trioxalatouranate', 'potassium(III)', '(VI)'],
-      explanation: 'The complex contains the bidentate oxalate ligand (C₂O₄²⁻), named as oxalato. Since the coordination sphere is anionic, aluminum becomes aluminate. Aluminum oxidation state is x + 3(-2) = -3 &rArr; x = +3. Thus: potassium trioxalatoaluminate(III).'
-    },
-    {
-      formula: '[Fe(H₂O)₆]Cl₃',
-      correctName: 'hexaaquairon(III) chloride',
-      parts: ['hexaaqua', 'iron', '(III)', 'chloride'],
-      distractors: ['ferrate', 'hexaaquairon', '(II)', 'trichloride'],
-      explanation: 'For [Fe(H₂O)₆]Cl₃, water is the neutral ligand "aqua". The sphere is cationic, so iron is named normally. The iron oxidation state is +3. Thus: hexaaquairon(III) chloride.'
-    },
-    {
-      formula: '[Cr(NH₃)₄Cl₂]Cl',
-      correctName: 'tetraamminedichloridochromium(III) chloride',
-      parts: ['tetraammine', 'dichloridochromium', '(III)', 'chloride'],
-      distractors: ['chromate', 'dichloridochromium(II)', 'tetraamine', 'dichloride'],
-      explanation: 'In [Cr(NH₃)₄Cl₂]Cl, "ammine" alphabetically precedes "chlorido". The complex is cationic, so chromium is named normally. The oxidation state of chromium is calculated as x + 4(0) + 2(-1) = +1 (since outer chloride is -1) &rArr; x = +3. Thus: tetraamminedichloridochromium(III) chloride.'
-    }
-  ];
-
-  let currentNomIndex = 0;
-  let nomScore = 0;
-  let nomStreak = 0;
-  let nomLives = 3;
-  let userAssembledParts = [];
-
-  function setupNomenclatureGame() {
-    const complex = nomenclatureComplexes[currentNomIndex];
-    document.getElementById('nom-formula').innerHTML = complex.formula;
-    userAssembledParts = [];
-    renderAssembledName();
-    
-    // Combine correct parts and distractors, then shuffle
-    let allCards = [...complex.parts, ...complex.distractors];
-    allCards = shuffleArray(allCards);
-    
-    const cardsContainer = document.getElementById('nom-cards-container');
-    cardsContainer.innerHTML = '';
-    
-    allCards.forEach(part => {
-      const card = document.createElement('button');
-      card.className = 'word-card';
-      card.innerText = part;
-      card.addEventListener('click', () => {
-        selectCard(part, card);
-      });
-      cardsContainer.appendChild(card);
-    });
-  }
-
-  function selectCard(part, cardElement) {
-    userAssembledParts.push(part);
-    cardElement.classList.add('selected-in-pool');
-    renderAssembledName();
-  }
-
-  function renderAssembledName() {
-    const container = document.getElementById('assembled-name-container');
-    if (userAssembledParts.length === 0) {
-      container.innerHTML = '<span class="assembled-name-placeholder">Click elements below to assemble the name...</span>';
-    } else {
-      container.innerHTML = '';
-      userAssembledParts.forEach((part, index) => {
-        const item = document.createElement('span');
-        item.className = 'word-card';
-        item.style.border = '1px solid var(--primary)';
-        item.innerText = part;
-        item.addEventListener('click', () => {
-          // Remove this card from assembled name
-          userAssembledParts.splice(index, 1);
-          // Restore it in the cards pool
-          const poolCards = document.querySelectorAll('#nom-cards-container .word-card');
-          for (let card of poolCards) {
-            if (card.innerText === part && card.classList.contains('selected-in-pool')) {
-              card.classList.remove('selected-in-pool');
-              break;
-            }
-          }
-          renderAssembledName();
-        });
-        container.appendChild(item);
-      });
-    }
-  }
-
-  // Clear assembled name
-  document.getElementById('nom-clear-btn').addEventListener('click', () => {
-    userAssembledParts = [];
-    renderAssembledName();
-    const poolCards = document.querySelectorAll('#nom-cards-container .word-card');
-    poolCards.forEach(c => c.classList.remove('selected-in-pool'));
-  });
-
-  // Submit Answer
-  document.getElementById('nom-submit-btn').addEventListener('click', () => {
-    if (userAssembledParts.length === 0) return;
-    
-    const complex = nomenclatureComplexes[currentNomIndex];
-    // Compare assembled parts joined with space/none depending on logic.
-    // In IUPAC, the name is written as one word except for the counter ion.
-    // Our array parts represent logical segments that when concatenated in the right order match the correct answer.
-    const userJoined = userAssembledParts.join('').replace(/\s+/g, '').toLowerCase();
-    const correctJoined = complex.correctName.replace(/\s+/g, '').toLowerCase();
-    
-    const modal = document.getElementById('nom-feedback-modal');
-    const modalTitle = document.getElementById('nom-modal-title');
-    const modalBody = document.getElementById('nom-modal-body');
-    
-    if (userJoined === correctJoined) {
-      // Correct!
-      nomScore += 10;
-      nomStreak += 1;
-      document.getElementById('nom-score').innerText = nomScore;
-      document.getElementById('nom-streak').innerText = nomStreak;
-      
-      modalTitle.innerText = "Correct! 🎉";
-      modalTitle.className = "correct";
-      modalBody.innerHTML = `<p style="font-size:16px; margin-bottom:12px; color:var(--text-main); font-weight:600;">${complex.correctName}</p>
-                             <p style="font-size:13px; color:var(--text-muted);">${complex.explanation}</p>`;
-      
-      if (nomStreak >= 3) {
-        progressState.nomenclatureStreakReached = true;
-        updateOverallProgress();
-      }
-    } else {
-      // Incorrect
-      nomStreak = 0;
-      nomLives -= 1;
-      document.getElementById('nom-streak').innerText = nomStreak;
-      updateLivesHearts();
-      
-      modalTitle.innerText = "Incorrect ❌";
-      modalTitle.className = "incorrect";
-      modalBody.innerHTML = `<p style="font-size:13px; color:var(--text-muted); margin-bottom:12px;">Your assembled name was incorrect. Double-check ligand alphabetical ordering and metal oxidation state calculation.</p>
-                             <p style="font-size:16px; margin-bottom:12px; color:var(--text-main); font-weight:600;">Correct Name: ${complex.correctName}</p>
-                             <p style="font-size:13px; color:var(--text-muted);">${complex.explanation}</p>`;
-      
-      if (nomLives <= 0) {
-        nomScore = 0;
-        nomLives = 3;
-        document.getElementById('nom-score').innerText = nomScore;
-        updateLivesHearts();
-      }
-    }
-    
-    modal.classList.remove('hidden');
-  });
-
-  // Skip Complex
-  document.getElementById('nom-skip-btn').addEventListener('click', () => {
-    nextNomenclatureComplex();
-  });
-
-  // Modal Close / Next Complex
-  document.getElementById('nom-modal-close').addEventListener('click', () => {
-    document.getElementById('nom-feedback-modal').classList.add('hidden');
-    nextNomenclatureComplex();
-  });
-
-  function nextNomenclatureComplex() {
-    currentNomIndex = (currentNomIndex + 1) % nomenclatureComplexes.length;
-    setupNomenclatureGame();
-  }
-
-  function updateLivesHearts() {
-    let hearts = '';
-    for (let i = 0; i < nomLives; i++) {
-      hearts += '❤️';
-    }
-    for (let i = nomLives; i < 3; i++) {
-      hearts += '🖤';
-    }
-    document.getElementById('nom-lives').innerText = hearts;
-  }
-
-  setupNomenclatureGame();
-
-
-  // ==========================================
-  // GAME 2: CRYSTAL FIELD LAB & SIMULATOR
-  // ==========================================
-  const metalIons = {
-    Ti3: { name: "Ti³⁺", dCount: 1, formula: "[Ti(H₂O)₆]³⁺", colorName: "Purple/Violet", absorb: "Absorbs yellow-green (~490 nm)", hex: "#8A2BE2" },
-    V3:  { name: "V³⁺",  dCount: 2, formula: "[V(H₂O)₆]³⁺",  colorName: "Green",         absorb: "Absorbs blue-violet (~400 nm)", hex: "#228B22" },
-    Cr3: { name: "Cr³⁺", dCount: 3, formula: "[Cr(H₂O)₆]³⁺", colorName: "Violet-Blue",   absorb: "Absorbs yellow-red (~570 nm)", hex: "#4B0082" },
-    Mn3: { name: "Mn³⁺", dCount: 4, formula: "[Mn(H₂O)₆]³⁺", colorName: "Violet/Pink",   absorb: "Absorbs green-yellow (~520 nm)", hex: "#DA70D6" },
-    Fe3: { name: "Fe³⁺", dCount: 5, formula: "[Fe(H₂O)₆]³⁺", colorName: "Pale Violet",   absorb: "Absorbs violet-blue (~400 nm)", hex: "#E6E6FA" },
-    Fe2: { name: "Fe²⁺", dCount: 6, formula: "[Fe(H₂O)₆]²⁺", colorName: "Pale Green",    absorb: "Absorbs red (~700 nm)", hex: "#98FB98" },
-    Co3: { name: "Co³⁺", dCount: 6, formula: "[Co(NH₃)₆]³⁺", colorName: "Yellow-Orange", absorb: "Absorbs violet-blue (~470 nm)", hex: "#FFA500" },
-    Co2: { name: "Co²⁺", dCount: 7, formula: "[Co(H₂O)₆]²⁺", colorName: "Pink",          absorb: "Absorbs blue-green (~510 nm)", hex: "#FFC0CB" },
-    Ni2: { name: "Ni²⁺", dCount: 8, formula: "[Ni(H₂O)₆]²⁺", colorName: "Bright Green",  absorb: "Absorbs red/blue (~400/700 nm)", hex: "#00FF00" },
-    Cu2: { name: "Cu²⁺", dCount: 9, formula: "[Cu(H₂O)₆]²⁺", colorName: "Blue",          absorb: "Absorbs yellow-red (~600 nm)", hex: "#00BFFF" },
-    Zn2: { name: "Zn²⁺", dCount: 10,formula: "[Zn(H₂O)₆]²⁺", colorName: "Colorless",     absorb: "No d-d transition possible", hex: "#FFFFFF" }
+  const soluteData = {
+    NaCl: { name: "Sodium Chloride", mw: 58.5, vanthoff: 2, color: "#ff7675" },
+    Glucose: { name: "Glucose", mw: 180.0, vanthoff: 1, color: "#ffeaa7" },
+    Urea: { name: "Urea", mw: 60.0, vanthoff: 1, color: "#55efc4" },
+    Ethanol: { name: "Ethanol", mw: 46.0, vanthoff: 1, color: "#a29bfe" },
+    CaCl2: { name: "Calcium Chloride", mw: 111.0, vanthoff: 3, color: "#fd79a8" }
   };
 
-  const ligandsList = [
-    { value: "I",   name: "I⁻",   strength: "weak",   label: "Very Weak Field" },
-    { value: "Cl",  name: "Cl⁻",  strength: "weak",   label: "Weak Field" },
-    { value: "F",   name: "F⁻",   strength: "weak",   label: "Weak Field" },
-    { value: "H2O", name: "H₂O",  strength: "weak",   label: "Weak Field (Borderline)" },
-    { value: "NH3", name: "NH₃",  strength: "strong", label: "Strong Field" },
-    { value: "en",  name: "en",   strength: "strong", label: "Strong Field" },
-    { value: "CN",  name: "CN⁻",  strength: "strong", label: "Very Strong Field" },
-    { value: "CO",  name: "CO",   strength: "strong", label: "Extremely Strong Field" }
-  ];
+  const mixSoluteSelect = document.getElementById('mix-solute');
+  const mixMassSlider = document.getElementById('mix-mass');
+  const mixVolumeSlider = document.getElementById('mix-volume');
+  const mixTempSlider = document.getElementById('mix-temp');
 
-  const metalSelect = document.getElementById('lab-metal');
-  const ligandSelect = document.getElementById('lab-ligand');
-  const seriesSlider = document.getElementById('series-slider');
-  const geometryRadios = document.querySelectorAll('input[name="lab-geometry"]');
+  const mixMassVal = document.getElementById('mix-mass-val');
+  const mixVolumeVal = document.getElementById('mix-volume-val');
+  const mixTempVal = document.getElementById('mix-temp-val');
 
-  // Event Listeners for controls
-  metalSelect.addEventListener('change', runCFTCalculation);
-  
-  ligandSelect.addEventListener('change', (e) => {
-    // Sync slider with select
-    const selectedVal = e.target.value;
-    const idx = ligandsList.findIndex(l => l.value === selectedVal);
-    seriesSlider.value = idx;
-    runCFTCalculation();
+  let beakerCanvas = document.getElementById('beaker-particles-canvas');
+  let beakerCtx = beakerCanvas.getContext('2d');
+  let particlesArray = [];
+  let particlesAnimationId = null;
+
+  // Sync inputs and trigger calculations
+  mixSoluteSelect.addEventListener('change', () => {
+    updateSoluteLegendColor();
+    runConcentrationMath();
+  });
+  mixMassSlider.addEventListener('input', (e) => {
+    mixMassVal.innerText = parseFloat(e.target.value).toFixed(1) + 'g';
+    runConcentrationMath();
+  });
+  mixVolumeSlider.addEventListener('input', (e) => {
+    mixVolumeVal.innerText = e.target.value + 'mL';
+    runConcentrationMath();
+  });
+  mixTempSlider.addEventListener('input', (e) => {
+    mixTempVal.innerText = e.target.value + '°C';
+    runConcentrationMath();
   });
 
-  seriesSlider.addEventListener('input', (e) => {
-    // Sync select with slider
-    const idx = e.target.value;
-    ligandSelect.value = ligandsList[idx].value;
-    runCFTCalculation();
-  });
+  function updateSoluteLegendColor() {
+    const soluteKey = mixSoluteSelect.value;
+    const color = soluteData[soluteKey].color;
+    document.getElementById('legend-solute-color').style.backgroundColor = color;
+  }
 
-  geometryRadios.forEach(radio => {
-    radio.addEventListener('change', () => {
-      // Toggle Splitting Diagram visibility
-      const geometry = document.querySelector('input[name="lab-geometry"]:checked').value;
-      if (geometry === 'octahedral') {
-        document.getElementById('octahedral-diagram').classList.add('active');
-        document.getElementById('tetrahedral-diagram').classList.remove('active');
-      } else {
-        document.getElementById('octahedral-diagram').classList.remove('active');
-        document.getElementById('tetrahedral-diagram').classList.add('active');
+  function runConcentrationMath() {
+    progressState.concentrationMixerUsed = true;
+    updateOverallProgress();
+
+    const soluteKey = mixSoluteSelect.value;
+    const mass = parseFloat(mixMassSlider.value);
+    const volume = parseFloat(mixVolumeSlider.value);
+    const temp = parseFloat(mixTempSlider.value);
+
+    const solute = soluteData[soluteKey];
+    
+    // 1. Water Density equation: rho = 1.00 - 0.00025 * Temp
+    const waterDensity = 1.00 - 0.00025 * temp;
+    
+    // 2. Solvent Mass (g) = Volume (mL) * Water Density (approximate solvent volume matches beaker capacity minus solute displacing)
+    // To make it straightforward: Solvent Mass = Volume * waterDensity
+    const solventMassG = volume * waterDensity;
+    document.getElementById('mix-solvent-mass').innerText = `~ ${solventMassG.toFixed(1)} g`;
+
+    // 3. Moles calculation
+    const molesSolute = mass / solute.mw;
+    const molesWater = solventMassG / 18.02;
+
+    // 4. Molarity (M) = Moles / (Volume in L)
+    const molarity = molesSolute / (volume / 1000);
+    
+    // 5. Molality (m) = Moles / (Solvent Mass in kg)
+    const molality = molesSolute / (solventMassG / 1000);
+
+    // 6. Mole Fraction of Solute (X2) = n2 / (n1 + n2)
+    const moleFraction = molesSolute / (molesSolute + molesWater);
+
+    // 7. Mass Percent (w/w) = Mass Solute / Total Mass * 100
+    const massPercent = (mass / (mass + solventMassG)) * 100;
+
+    // 8. ppm = Mass Solute / Total Mass * 10^6
+    const ppm = (mass / (mass + solventMassG)) * 1000000;
+
+    // Update UI Results
+    document.getElementById('res-molarity').innerText = molarity.toFixed(3) + ' mol/L';
+    document.getElementById('res-molality').innerText = molality.toFixed(3) + ' mol/kg';
+    document.getElementById('res-molefraction').innerText = moleFraction.toFixed(5);
+    document.getElementById('res-masspercent').innerText = massPercent.toFixed(2) + ' %';
+    document.getElementById('res-ppm').innerText = Math.round(ppm).toLocaleString() + ' ppm';
+
+    // Update Recipe text box
+    document.getElementById('recipe-text').innerHTML = `Dissolve <strong>${mass.toFixed(1)}g</strong> of ${solute.name} (${molesSolute.toFixed(3)} moles) in approx <strong>${solventMassG.toFixed(1)}g</strong> of pure water. Adjust final solution volume to <strong>${volume}mL</strong>.`;
+
+    // Beaker Height Fill %
+    const beakerFluid = document.getElementById('beaker-fluid');
+    const heightPercent = Math.max(10, (volume / 1000) * 100); // map max 1000ml to 100% height
+    beakerFluid.style.height = heightPercent + '%';
+
+    // Set liquid color intensity: strong solutions are more saturated
+    // Base blue: rgba(9, 132, 227, 0.3) to darker/saturated blue-green
+    const concentrationRatio = Math.min(1.0, molarity / 4.0); // capped at 4M for visual max
+    const fluidOpacity = 0.2 + (concentrationRatio * 0.55);
+    beakerFluid.style.background = `linear-gradient(180deg, rgba(9, 132, 227, ${fluidOpacity}) 0%, rgba(0, 242, 254, ${fluidOpacity + 0.1}) 100%)`;
+
+    // Adjust particle count and speeds
+    updateBeakerParticles(molesSolute, temp, solute.color);
+  }
+
+  function initBeakerCanvas() {
+    if (particlesAnimationId) {
+      cancelAnimationFrame(particlesAnimationId);
+    }
+    const beakerFillDiv = document.getElementById('beaker-fluid');
+    beakerCanvas.width = beakerFillDiv.clientWidth || 170;
+    beakerCanvas.height = beakerFillDiv.clientHeight || 240;
+
+    runConcentrationMath();
+    animateBeakerParticles();
+  }
+
+  // Handle window resizing once
+  window.addEventListener('resize', () => {
+    if (document.getElementById('concentration-lab').classList.contains('active')) {
+      const beakerFillDiv = document.getElementById('beaker-fluid');
+      if (beakerFillDiv) {
+        beakerCanvas.width = beakerFillDiv.clientWidth || 170;
+        beakerCanvas.height = beakerFillDiv.clientHeight || 240;
+        runConcentrationMath();
       }
-      runCFTCalculation();
+    }
+  });
+
+  class BeakerParticle {
+    constructor(x, y, color, speedFactor, radius, type) {
+      this.x = x;
+      this.y = y;
+      this.color = color;
+      this.radius = radius;
+      this.type = type; // 'water' or 'solute'
+      this.vx = (Math.random() - 0.5) * speedFactor;
+      this.vy = (Math.random() - 0.5) * speedFactor;
+    }
+
+    update(width, height) {
+      this.x += this.vx;
+      this.y += this.vy;
+
+      // Bounce borders
+      if (this.x < this.radius || this.x > width - this.radius) this.vx *= -1;
+      if (this.y < this.radius || this.y > height - this.radius) this.vy *= -1;
+      
+      // Keep inside bounds
+      this.x = Math.max(this.radius, Math.min(width - this.radius, this.x));
+      this.y = Math.max(this.radius, Math.min(height - this.radius, this.y));
+    }
+
+    draw(ctx) {
+      ctx.beginPath();
+      ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+      ctx.fillStyle = this.color;
+      ctx.fill();
+      if (this.type === 'solute') {
+        ctx.strokeStyle = 'rgba(255,255,255,0.4)';
+        ctx.lineWidth = 1;
+        ctx.stroke();
+      }
+    }
+  }
+
+  function updateBeakerParticles(moles, temp, soluteColor) {
+    const soluteCount = Math.min(65, Math.max(5, Math.round(moles * 100)));
+    const waterCount = 35; // stable background
+    
+    // speed proportional to Temp
+    const speedFactor = 0.5 + (temp / 80) * 2.0;
+
+    particlesArray = [];
+
+    const w = beakerCanvas.width || 170;
+    const h = beakerCanvas.height || 100;
+
+    // Create Water Particles (small blue dots)
+    for (let i = 0; i < waterCount; i++) {
+      particlesArray.push(new BeakerParticle(
+        Math.random() * w,
+        Math.random() * h,
+        'rgba(0, 242, 254, 0.25)',
+        speedFactor * 0.5,
+        3,
+        'water'
+      ));
+    }
+
+    // Create Solute Particles (larger colorful dots)
+    for (let i = 0; i < soluteCount; i++) {
+      particlesArray.push(new BeakerParticle(
+        Math.random() * w,
+        Math.random() * h,
+        soluteColor,
+        speedFactor * 1.2,
+        6,
+        'solute'
+      ));
+    }
+  }
+
+  function animateBeakerParticles() {
+    const w = beakerCanvas.width;
+    const h = beakerCanvas.height;
+
+    // Clear canvas
+    beakerCtx.clearRect(0, 0, w, h);
+
+    // Draw scale lines behind particles
+    beakerCtx.strokeStyle = 'rgba(255,255,255,0.06)';
+    beakerCtx.lineWidth = 1;
+    for (let y = 30; y < h; y += 40) {
+      beakerCtx.beginPath();
+      beakerCtx.moveTo(0, y);
+      beakerCtx.lineTo(w, y);
+      beakerCtx.stroke();
+    }
+
+    // Render each particle
+    particlesArray.forEach(p => {
+      p.update(w, h);
+      p.draw(beakerCtx);
+    });
+
+    particlesAnimationId = requestAnimationFrame(animateBeakerParticles);
+  }
+
+  // ==========================================
+  // VIRTUAL LAB 2: RAOULT'S LAW DEVIATIONS
+  // ==========================================
+  const forceSlider = document.getElementById('force-slider');
+  const graphCanvas = document.getElementById('raoult-graph-canvas');
+  const graphCtx = graphCanvas.getContext('2d');
+
+  forceSlider.addEventListener('input', () => {
+    progressState.raoultsForcesAdjusted = true;
+    updateOverallProgress();
+    drawRaoultGraph();
+  });
+
+  const deviationInfo = {
+    "ideal": {
+      title: "Ideal Solution (No Deviation)",
+      forces: "A-B molecular attractions are equal to A-A and B-B forces.",
+      badge: "Ideal (No Deviation)",
+      badgeClass: "deviation-badge",
+      examples: "• Benzene + Toluene<br>• n-Hexane + n-Heptane<br>• Bromoethane + Iodoethane",
+      hVal: "= 0 (Zero heat exchange)",
+      vVal: "= 0 (Zero volume change)",
+      mechanism: "Forces are perfectly balanced. The escaping tendency of A and B molecules remains exactly proportional to their concentration in the liquid mixture.",
+      azeotrope: false
+    },
+    "positive": {
+      title: "Positive Deviation (Weaker A-B)",
+      forces: "A-B attractions are weaker than self-attractions (A-A and B-B).",
+      badge: "Positive Deviation",
+      badgeClass: "deviation-badge positive",
+      examples: "• Ethanol + Acetone<br>• Carbon disulfide + Acetone<br>• Acetone + Benzene",
+      hVal: "> 0 (Endothermic, absorbs heat)",
+      vVal: "> 0 (Volume expands)",
+      mechanism: "Since A and B molecules don't attract each other strongly, they find it easier to escape the liquid surface. This increases the individual and total vapor pressures above the ideal lines.",
+      azeotrope: true,
+      azeotropeText: "<strong>Minimum Boiling Azeotrope:</strong> At the maximum point of positive deviation, the vapor pressure reaches its highest peak. Consequently, this solution boils at a temperature lower than either of its pure constituents."
+    },
+    "negative": {
+      title: "Negative Deviation (Stronger A-B)",
+      forces: "A-B attractions are stronger than self-attractions (e.g. hydrogen bonding).",
+      badge: "Negative Deviation",
+      badgeClass: "deviation-badge negative",
+      examples: "• Chloroform + Acetone<br>• Nitric acid + Water<br>• Phenol + Aniline",
+      hVal: "< 0 (Exothermic, releases heat)",
+      vVal: "< 0 (Volume contracts)",
+      mechanism: "A and B molecules form strong complex bonds (like Chloroform-Acetone H-bonds) in solution. Molecules are held tightly in liquid phase, decreasing their tendency to escape and depressing vapor pressures below ideal.",
+      azeotrope: true,
+      azeotropeText: "<strong>Maximum Boiling Azeotrope:</strong> At the deepest point of negative deviation, the vapor pressure hits its lowest trough. Consequently, this solution boils at a temperature higher than either of its pure constituents."
+    }
+  };
+
+  function drawRaoultGraph() {
+    const val = parseInt(forceSlider.value);
+    let state = "ideal";
+    if (val > 0) state = "positive";
+    if (val < 0) state = "negative";
+
+    const info = deviationInfo[state];
+
+    // Update UI details
+    document.getElementById('interaction-title').innerText = info.title;
+    document.getElementById('interaction-forces').innerText = info.forces;
+    
+    const badge = document.getElementById('deviation-badge-val');
+    badge.className = info.badgeClass;
+    badge.innerText = info.badge;
+
+    document.getElementById('chem-examples-list').innerHTML = info.examples;
+    document.getElementById('thermo-h').innerText = info.hVal;
+    document.getElementById('thermo-v').innerText = info.vVal;
+    document.getElementById('interaction-mechanism-text').innerHTML = info.mechanism;
+
+    const azBox = document.getElementById('azeotrope-warning-box');
+    if (info.azeotrope && Math.abs(val) >= 4) {
+      azBox.classList.remove('hidden');
+      azBox.innerHTML = info.azeotropeText;
+    } else {
+      azBox.classList.add('hidden');
+    }
+
+    // Canvas drawing
+    const w = graphCanvas.width;
+    const h = graphCanvas.height;
+    
+    graphCtx.clearRect(0, 0, w, h);
+
+    const padding = 50;
+    const graphWidth = w - padding * 2;
+    const graphHeight = h - padding * 2;
+
+    // Axis lines
+    graphCtx.strokeStyle = 'rgba(255,255,255,0.15)';
+    graphCtx.lineWidth = 2;
+    graphCtx.beginPath();
+    // Y1 Axis (Left)
+    graphCtx.moveTo(padding, padding);
+    graphCtx.lineTo(padding, h - padding);
+    // Y2 Axis (Right)
+    graphCtx.moveTo(w - padding, padding);
+    graphCtx.lineTo(w - padding, h - padding);
+    // X Axis (Bottom)
+    graphCtx.moveTo(padding, h - padding);
+    graphCtx.lineTo(w - padding, h - padding);
+    graphCtx.stroke();
+
+    // Labels & Text styling
+    graphCtx.fillStyle = 'rgba(255,255,255,0.7)';
+    graphCtx.font = '11px Inter, sans-serif';
+    graphCtx.textAlign = 'center';
+
+    // X axis ticks labels
+    graphCtx.fillText('χ_A = 1', padding, h - padding + 18);
+    graphCtx.fillText('χ_B = 0', padding, h - padding + 32);
+    graphCtx.fillText('χ_A = 0', w - padding, h - padding + 18);
+    graphCtx.fillText('χ_B = 1', w - padding, h - padding + 32);
+
+    graphCtx.fillText('Mole Fraction', w / 2, h - 8);
+
+    // Left Y Axis labels
+    graphCtx.textAlign = 'right';
+    graphCtx.fillText('p_A° = 150 mmHg', padding - 10, h - padding - 150 + 4);
+    // Right Y Axis labels
+    graphCtx.textAlign = 'left';
+    graphCtx.fillText('p_B° = 200 mmHg', w - padding + 10, h - padding - 200 + 4);
+
+    // Grid guide lines (Vapor Pressure limits)
+    graphCtx.strokeStyle = 'rgba(255,255,255,0.05)';
+    graphCtx.lineWidth = 1;
+    graphCtx.beginPath();
+    graphCtx.moveTo(padding, h - padding - 150);
+    graphCtx.lineTo(w - padding, h - padding - 150);
+    graphCtx.moveTo(padding, h - padding - 200);
+    graphCtx.lineTo(w - padding, h - padding - 200);
+    graphCtx.stroke();
+
+    // Ideal equations lines (Straight references)
+    // Pure A (x_A=1, left) = 150. Pure B (x_B=1, right) = 200.
+    // pA ideal: straight line from (padding, h - padding - 150) to (w - padding, h - padding)
+    // pB ideal: straight line from (padding, h - padding) to (w - padding, h - padding - 200)
+    // Ptotal ideal: straight line from (padding, h - padding - 150) to (w - padding, h - padding - 200)
+    
+    // Draw Ideal lines faint
+    graphCtx.strokeStyle = 'rgba(255,255,255,0.1)';
+    graphCtx.lineWidth = 1;
+    graphCtx.setLineDash([5, 5]);
+    
+    graphCtx.beginPath();
+    graphCtx.moveTo(padding, h - padding - 150);
+    graphCtx.lineTo(w - padding, h - padding);
+    graphCtx.moveTo(padding, h - padding);
+    graphCtx.lineTo(w - padding, h - padding - 200);
+    graphCtx.moveTo(padding, h - padding - 150);
+    graphCtx.lineTo(w - padding, h - padding - 200);
+    graphCtx.stroke();
+    graphCtx.setLineDash([]); // Reset line dash
+
+    // Plotting the actual curves depending on force slider
+    const deviationMult = val * 22; // multiplier scale for curves bending
+    
+    // p_A Curve
+    graphCtx.strokeStyle = '#ff7675';
+    graphCtx.lineWidth = 2.5;
+    graphCtx.beginPath();
+    for (let x = 0; x <= graphWidth; x++) {
+      let xB = x / graphWidth;
+      let xA = 1 - xB;
+      // p_A = p_A^0 * x_A + curve
+      let idealPA = 150 * xA;
+      // Quadratic curve that is zero at endpoints: curve = k * x_A * x_B
+      let curve = deviationMult * xA * xB;
+      let y = h - padding - (idealPA + curve);
+      if (x === 0) graphCtx.moveTo(padding + x, y);
+      else graphCtx.lineTo(padding + x, y);
+    }
+    graphCtx.stroke();
+
+    // p_B Curve
+    graphCtx.strokeStyle = '#74b9ff';
+    graphCtx.lineWidth = 2.5;
+    graphCtx.beginPath();
+    for (let x = 0; x <= graphWidth; x++) {
+      let xB = x / graphWidth;
+      let xA = 1 - xB;
+      let idealPB = 200 * xB;
+      let curve = deviationMult * xA * xB;
+      let y = h - padding - (idealPB + curve);
+      if (x === 0) graphCtx.moveTo(padding + x, y);
+      else graphCtx.lineTo(padding + x, y);
+    }
+    graphCtx.stroke();
+
+    // P_total Curve
+    graphCtx.strokeStyle = '#00f2fe';
+    graphCtx.lineWidth = 4;
+    graphCtx.beginPath();
+    for (let x = 0; x <= graphWidth; x++) {
+      let xB = x / graphWidth;
+      let xA = 1 - xB;
+      let idealPA = 150 * xA;
+      let idealPB = 200 * xB;
+      let curvePA = deviationMult * xA * xB;
+      let curvePB = deviationMult * xA * xB;
+      let y = h - padding - (idealPA + curvePA + idealPB + curvePB);
+      if (x === 0) graphCtx.moveTo(padding + x, y);
+      else graphCtx.lineTo(padding + x, y);
+    }
+    graphCtx.stroke();
+
+    // Draw Title Labels on curves
+    graphCtx.fillStyle = '#00f2fe';
+    graphCtx.font = 'bold 12px Inter, sans-serif';
+    graphCtx.fillText('P_total', w/2, h - padding - (175 + deviationMult * 0.5) - 15);
+  }
+
+  // ==========================================
+  // VIRTUAL LAB 3: COLLIGATIVE PROPERTIES
+  // ==========================================
+  const collSoluteSelect = document.getElementById('coll-solute');
+  const collMolalitySlider = document.getElementById('coll-molality');
+  const collMolalityVal = document.getElementById('coll-molality-val');
+
+  const vizTabs = document.querySelectorAll('.viz-tab-btn');
+  const vizContents = document.querySelectorAll('.viz-content');
+
+  const osmosisCanvas = document.getElementById('osmosis-canvas');
+  const osmosisCtx = osmosisCanvas.getContext('2d');
+  const phaseCanvas = document.getElementById('phasediagram-canvas');
+  const phaseCtx = phaseCanvas.getContext('2d');
+
+  let activeVizTab = "osmosis";
+  let osmosisParticles = [];
+  let osmosisAnimationId = null;
+  let osmoticPressureApplied = false;
+  let membraneX = 280;
+
+  // Constants for Water solvent
+  const Kf = 1.86;
+  const Kb = 0.52;
+
+  collSoluteSelect.addEventListener('change', runColligativeMath);
+  collMolalitySlider.addEventListener('input', (e) => {
+    collMolalityVal.innerText = parseFloat(e.target.value).toFixed(1) + ' mol/kg';
+    runColligativeMath();
+  });
+
+  // Apply Osmotic Pressure toggle
+  document.getElementById('btn-apply-pressure').addEventListener('click', (e) => {
+    osmoticPressureApplied = !osmoticPressureApplied;
+    if (osmoticPressureApplied) {
+      e.target.innerText = "Release Osmotic Pressure";
+      e.target.classList.add('btn-glow');
+    } else {
+      e.target.innerText = "Apply Osmotic Pressure (Π)";
+      e.target.classList.remove('btn-glow');
+    }
+  });
+
+  // Viz Tabs control
+  vizTabs.forEach(tab => {
+    tab.addEventListener('click', () => {
+      vizTabs.forEach(t => t.classList.remove('active'));
+      tab.classList.add('active');
+
+      activeVizTab = tab.getAttribute('data-viz');
+      vizContents.forEach(c => {
+        c.classList.remove('active');
+        if (c.getAttribute('id') === `viz-${activeVizTab}`) {
+          c.classList.add('active');
+        }
+      });
+
+      initColligativeVisualizers();
     });
   });
 
-  function runCFTCalculation() {
-    const metalKey = metalSelect.value;
-    const geometry = document.querySelector('input[name="lab-geometry"]:checked').value;
-    const ligandVal = ligandSelect.value;
-    
-    const metal = metalIons[metalKey];
-    const ligand = ligandsList.find(l => l.value === ligandVal);
-    const dCount = metal.dCount;
-    const isSFL = ligand.strength === 'strong';
+  function runColligativeMath() {
+    progressState.colligativeShiftsObserved = true;
+    updateOverallProgress();
 
-    // 1. Update Field Strength Badge & Relations text
-    const strengthBadge = document.getElementById('field-strength-badge');
-    const fieldRelation = document.getElementById('field-relation');
+    const soluteKey = collSoluteSelect.value;
+    const molality = parseFloat(collMolalitySlider.value);
     
-    if (isSFL) {
-      strengthBadge.innerText = `${ligand.label} (SFL)`;
-      strengthBadge.className = "badge sfl-badge";
-      fieldRelation.innerText = geometry === 'octahedral' ? "Δₒ > P (Pairing Energy). Low Spin complex forms." : "Δₜ is small, usually high spin regardless of ligand.";
+    let iFactor = 1.0;
+    if (soluteKey === "NaCl") iFactor = 2.0;
+    if (soluteKey === "CaCl2") iFactor = 3.0;
+
+    // Calculate Delta Tf and Delta Tb
+    const dTf = iFactor * Kf * molality;
+    const dTb = iFactor * Kb * molality;
+
+    const newTf = 0.0 - dTf;
+    const newTb = 100.0 + dTb;
+
+    // Osmotic Pressure = i * C * R * T (approximate C by molality m)
+    // Pi = i * m * 0.0821 * 298.15
+    const osmoticPressure = iFactor * molality * 0.0821 * 298.15;
+
+    // Update UI Elements
+    document.getElementById('coll-dtf').innerText = dTf.toFixed(2) + ' °C';
+    document.getElementById('coll-newtf').innerText = newTf.toFixed(2) + ' °C';
+    document.getElementById('coll-dtb').innerText = dTb.toFixed(2) + ' °C';
+    document.getElementById('coll-newtb').innerText = newTb.toFixed(2) + ' °C';
+    
+    const iBadge = document.getElementById('coll-i-factor');
+    iBadge.innerText = iFactor.toFixed(2);
+    
+    document.getElementById('val-osmotic-pressure').innerText = osmoticPressure.toFixed(1) + ' atm';
+
+    // Sync visual updates
+    if (activeVizTab === "osmosis") {
+      updateOsmosisProperties(iFactor, molality);
     } else {
-      strengthBadge.innerText = `${ligand.label} (WFL)`;
-      strengthBadge.className = "badge wfl-badge";
-      fieldRelation.innerText = geometry === 'octahedral' ? "Δₒ < P. High Spin complex forms." : "Δₜ is small, high spin complex forms.";
+      drawPhaseDiagram(dTf, dTb);
+    }
+  }
+
+  function initColligativeVisualizers() {
+    cancelAnimationFrame(osmosisAnimationId);
+    
+    if (activeVizTab === "osmosis") {
+      osmosisCanvas.width = 560;
+      osmosisCanvas.height = 300;
+      setupOsmosisParticles();
+      animateOsmosis();
+    } else {
+      phaseCanvas.width = 560;
+      phaseCanvas.height = 300;
+      runColligativeMath(); // triggers drawPhaseDiagram()
+    }
+  }
+
+  // Osmosis animation setup
+  class OsmosisParticle {
+    constructor(x, y, type, color, radius, allowedSide) {
+      this.x = x;
+      this.y = y;
+      this.type = type; // 'water' or 'solute'
+      this.color = color;
+      this.radius = radius;
+      this.allowedSide = allowedSide; // 'left', 'right', or 'any'
+      
+      const angle = Math.random() * Math.PI * 2;
+      const speed = type === 'solute' ? 1.0 : 1.8;
+      this.vx = Math.cos(angle) * speed;
+      this.vy = Math.sin(angle) * speed;
     }
 
-    // 2. Splitting Math and Configuration
-    let configStr = '';
-    let unpaired = 0;
-    let configArray = []; // Format: [ [eg_up, eg_down, ...], [t2g_up, t2g_down, ...] ] or tetrahedral equivalent
-    let spinState = "High Spin";
+    update(w, h, liquidHeights, appliedPressure) {
+      this.x += this.vx;
+      this.y += this.vy;
 
-    if (geometry === 'octahedral') {
-      let t2g_elec = [0, 0, 0]; // electrons in 3 t2g orbitals
-      let eg_elec = [0, 0];    // electrons in 2 eg orbitals
-      
-      if (dCount <= 3) {
-        // d1 to d3 fill t2g singly
-        for (let i = 0; i < dCount; i++) {
-          t2g_elec[i] = 1;
-        }
-        spinState = "N/A (Simple)";
-        unpaired = dCount;
-      } else if (dCount >= 8) {
-        // d8 to d10 fill completely (no spin difference)
-        // t2g is filled (6 electrons), remaining fill eg
-        t2g_elec = [2, 2, 2];
-        let rem = dCount - 6;
-        if (rem === 2) { eg_elec = [1, 1]; unpaired = 2; }
-        if (rem === 3) { eg_elec = [2, 1]; unpaired = 1; }
-        if (rem === 4) { eg_elec = [2, 2]; unpaired = 0; }
-        spinState = "N/A (Simple)";
-      } else {
-        // d4, d5, d6, d7 depend on ligand strength
-        if (isSFL) {
-          // Strong Field: fill t2g completely before eg
-          spinState = "Low Spin Complex";
-          if (dCount === 4) { t2g_elec = [2, 1, 1]; unpaired = 2; }
-          if (dCount === 5) { t2g_elec = [2, 2, 1]; unpaired = 1; }
-          if (dCount === 6) { t2g_elec = [2, 2, 2]; unpaired = 0; }
-          if (dCount === 7) { t2g_elec = [2, 2, 2]; eg_elec = [1, 0]; unpaired = 1; }
-        } else {
-          // Weak Field: fill t2g singly, then eg singly, then pair up
-          spinState = "High Spin Complex";
-          if (dCount === 4) { t2g_elec = [1, 1, 1]; eg_elec = [1, 0]; unpaired = 4; }
-          if (dCount === 5) { t2g_elec = [1, 1, 1]; eg_elec = [1, 1]; unpaired = 5; }
-          if (dCount === 6) { t2g_elec = [2, 1, 1]; eg_elec = [1, 1]; unpaired = 4; }
-          if (dCount === 7) { t2g_elec = [2, 2, 1]; eg_elec = [1, 1]; unpaired = 3; }
-        }
+      // Vertical wall bounce (SPM interactions)
+      // SPM is at x = 280
+      const currentSide = this.x < membraneX ? 'left' : 'right';
+      const heightLimit = currentSide === 'left' ? h - liquidHeights.left : h - liquidHeights.right;
+
+      // Top water surface bounces
+      if (this.y < heightLimit + this.radius) {
+        this.vy = Math.abs(this.vy);
+        this.y = heightLimit + this.radius;
       }
-      configStr = `t₂g${getSuperscript(t2g_elec.reduce((a,b)=>a+b, 0))} eg${getSuperscript(eg_elec.reduce((a,b)=>a+b, 0))}`;
-      configArray = [eg_elec, t2g_elec]; // [eg, t2g] for Octahedral rendering
-      
-    } else {
-      // Tetrahedral (always high spin in NCERT/reality because delta_t is very small)
-      let e_elec = [0, 0];    // 2 e orbitals
-      let t2_elec = [0, 0, 0]; // 3 t2 orbitals
-      spinState = "High Spin (Δₜ is small)";
 
-      if (dCount === 1) { e_elec = [1, 0]; unpaired = 1; }
-      else if (dCount === 2) { e_elec = [1, 1]; unpaired = 2; }
-      else if (dCount === 3) { e_elec = [1, 1]; t2_elec = [1, 0, 0]; unpaired = 3; }
-      else if (dCount === 4) { e_elec = [1, 1]; t2_elec = [1, 1, 0]; unpaired = 4; }
-      else if (dCount === 5) { e_elec = [1, 1]; t2_elec = [1, 1, 1]; unpaired = 5; }
-      else if (dCount === 6) { e_elec = [2, 1]; t2_elec = [1, 1, 1]; unpaired = 4; }
-      else if (dCount === 7) { e_elec = [2, 2]; t2_elec = [1, 1, 1]; unpaired = 3; }
-      else if (dCount === 8) { e_elec = [2, 2]; t2_elec = [2, 1, 1]; unpaired = 2; }
-      else if (dCount === 9) { e_elec = [2, 2]; t2_elec = [2, 2, 1]; unpaired = 1; }
-      else if (dCount === 10) { e_elec = [2, 2]; t2_elec = [2, 2, 2]; unpaired = 0; }
+      // Bottom bounce
+      if (this.y > h - this.radius) {
+        this.vy = -Math.abs(this.vy);
+        this.y = h - this.radius;
+      }
 
-      configStr = `e${getSuperscript(e_elec.reduce((a,b)=>a+b, 0))} t₂${getSuperscript(t2_elec.reduce((a,b)=>a+b, 0))}`;
-      configArray = [t2_elec, e_elec]; // [t2, e] for Tetrahedral rendering
-    }
+      // Left and Right outer wall bounces
+      if (this.x < this.radius) {
+        this.vx = Math.abs(this.vx);
+        this.x = this.radius;
+      }
+      if (this.x > w - this.radius) {
+        this.vx = -Math.abs(this.vx);
+        this.x = w - this.radius;
+      }
 
-    // 3. Render configurations inside the HTML orbital boxes
-    renderOrbitalDiagram(geometry, configArray);
-
-    // 4. Update calculations text in sidebar
-    document.getElementById('res-config').innerText = configStr;
-    document.getElementById('res-spin').innerText = spinState;
-    document.getElementById('res-unpaired').innerText = unpaired;
-    
-    // Magnetic Moment: sqrt(n(n+2))
-    const mu = Math.sqrt(unpaired * (unpaired + 2)).toFixed(2);
-    const magType = unpaired > 0 ? "Paramagnetic" : "Diamagnetic";
-    document.getElementById('res-magnetic').innerText = `${mu} BM (${magType})`;
-
-    // 5. Representative Color logic (simulation mapping)
-    // SFL makes splitting gap larger, meaning higher energy blue/violet light is absorbed, and red/orange/yellow light is transmitted (complementary).
-    // WFL makes splitting gap smaller, meaning lower energy red/infrared/yellow light is absorbed, and blue/green light is transmitted.
-    // Exception: d10 and d0 are colorless.
-    let displayColor = "#FFFFFF";
-    let displayColorName = "Colorless";
-    let absorbedWavelengthText = "No d-d transition (Colorless)";
-
-    if (dCount > 0 && dCount < 10) {
-      if (geometry === 'octahedral') {
-        if (isSFL) {
-          // High split gap: Absorbs blue-violet (430-490 nm) &rArr; displays Yellow-Orange-Red
-          displayColor = "#FF8C00";
-          displayColorName = "Orange-Yellow";
-          absorbedWavelengthText = "Absorbs: Violet-Blue (~450 nm) due to high Δₒ";
-        } else {
-          // Low split gap: Absorbs orange-red (600-650 nm) &rArr; displays Green-Blue
-          displayColor = "#00FFFF";
-          displayColorName = "Pale Blue-Green";
-          absorbedWavelengthText = "Absorbs: Yellow-Red (~630 nm) due to low Δₒ";
-        }
-        
-        // Override with specific NCERT cases for maximum accuracy
-        if (metalKey === "Ti3") {
-          displayColor = "#D8BFD8";
-          displayColorName = "Light Violet / Purple";
-          absorbedWavelengthText = "Absorbs: Green-Yellow (~498 nm) &rArr; [Ti(H₂O)₆]³⁺";
-        }
-        if (metalKey === "Co3" && isSFL) {
-          displayColor = "#FFD700";
-          displayColorName = "Golden Yellow";
-          absorbedWavelengthText = "Absorbs: Violet (~430 nm) &rArr; [Co(NH₃)₆]³⁺";
-        }
-        if (metalKey === "Ni2" && ligandVal === "H2O") {
-          displayColor = "#90EE90";
-          displayColorName = "Pale Green";
-          absorbedWavelengthText = "Absorbs: Red (~680 nm) &rArr; [Ni(H₂O)₆]²⁺";
-        }
-        if (metalKey === "Ni2" && ligandVal === "en") {
-          displayColor = "#DA70D6";
-          displayColorName = "Purple-Violet";
-          absorbedWavelengthText = "Absorbs: Yellow-Green &rArr; [Ni(en)₃]²⁺";
-        }
-        if (metalKey === "Cu2") {
-          displayColor = "#3182ce";
-          displayColorName = "Light Blue";
-          absorbedWavelengthText = "Absorbs: Yellow-Orange (~600 nm) &rArr; [Cu(H₂O)₆]²⁺";
+      // Semi-permeable membrane boundary bounce (x = 280)
+      if (this.type === 'solute') {
+        // Solute cannot cross membrane (always bounces off membraneX)
+        if (this.x > membraneX - this.radius && this.x < membraneX + 5) {
+          this.vx = -Math.abs(this.vx);
+          this.x = membraneX - this.radius;
         }
       } else {
-        // Tetrahedral: splitting is 4/9 of octahedral, very small gap &rArr; absorbs long wavelengths (infrared/red) &rArr; looks dark blue/green/indigo
-        displayColor = "#0A2540";
-        displayColorName = "Deep Blue / Cobalt Blue";
-        absorbedWavelengthText = "Absorbs: Orange-Red (~660 nm) due to low Δₜ";
-        if (metalKey === "Co2") {
-          displayColor = "#0047AB";
-          displayColorName = "Deep Cobalt Blue";
-          absorbedWavelengthText = "Absorbs: Red (~650 nm) &rArr; [CoCl₄]²⁻";
+        // Water can cross. But if osmotic pressure is NOT applied,
+        // we simulate a slight bias of flow from left to right.
+        // If osmotic pressure is applied, we push them back with bias right to left.
+        if (Math.abs(this.x - membraneX) < this.radius + 1) {
+          let crossChance = Math.random();
+          let bias = 0.53; // default flow: left to right (53% cross right, 47% cross left)
+          if (appliedPressure) {
+            bias = 0.38; // reversed flow: right to left
+          }
+
+          if (this.vx > 0) { // moving right
+            if (crossChance > bias) {
+              this.vx = -this.vx; // bounce back
+            }
+          } else { // moving left
+            if (crossChance > (1 - bias)) {
+              this.vx = -this.vx; // bounce back
+            }
+          }
         }
       }
     }
 
-    document.getElementById('res-color-name').innerText = displayColorName;
-    document.getElementById('res-absorb').innerText = absorbedWavelengthText;
-    document.getElementById('color-preview-patch').style.backgroundColor = displayColor;
+    draw(ctx) {
+      ctx.beginPath();
+      ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+      ctx.fillStyle = this.color;
+      ctx.fill();
+      if (this.type === 'solute') {
+        ctx.strokeStyle = 'rgba(255,255,255,0.4)';
+        ctx.lineWidth = 1;
+        ctx.stroke();
+      }
+    }
+  }
 
-    // 6. Update Representative Formula label
-    let repFormula = `[${metal.name.substring(0,2)}(${ligand.name})₆]`;
-    // adjust charge
-    let metalCharge = metalKey.includes('3') ? 3 : 2;
-    let ligandCharge = ligandVal === 'CN' ? -6 : ligandVal === 'I' || ligandVal === 'Cl' || ligandVal === 'F' ? -6 : 0;
-    let totalCharge = metalCharge + ligandCharge;
-    
-    let chargeSymbol = '';
-    if (totalCharge > 0) chargeSymbol = `<sup>${totalCharge === 1 ? '+' : totalCharge + '+'}</sup>`;
-    if (totalCharge < 0) chargeSymbol = `<sup>${Math.abs(totalCharge) === 1 ? '-' : Math.abs(totalCharge) + '-'}</sup>`;
-    
-    if (geometry === 'octahedral') {
-      repFormula = `[${metalKey.substring(0,2).replace(/\d/g,'')}(${ligand.name})₆]${chargeSymbol}`;
+  let liquidLevels = { left: 160, right: 160, targetLeft: 160, targetRight: 160 };
+
+  function setupOsmosisParticles() {
+    osmosisParticles = [];
+    const w = osmosisCanvas.width;
+    const h = osmosisCanvas.height;
+
+    // reset liquid levels
+    liquidLevels = { left: 180, right: 180, targetLeft: 180, targetRight: 180 };
+
+    // Water particles in left chamber (Pure water)
+    for (let i = 0; i < 40; i++) {
+      osmosisParticles.push(new OsmosisParticle(
+        Math.random() * (membraneX - 20) + 10,
+        Math.random() * 100 + 190,
+        'water',
+        'rgba(0, 242, 254, 0.65)',
+        3.5,
+        'left'
+      ));
+    }
+
+    // Water particles in right chamber (Solution)
+    for (let i = 0; i < 30; i++) {
+      osmosisParticles.push(new OsmosisParticle(
+        Math.random() * (w - membraneX - 30) + membraneX + 15,
+        Math.random() * 100 + 190,
+        'water',
+        'rgba(0, 242, 254, 0.65)',
+        3.5,
+        'right'
+      ));
+    }
+  }
+
+  function updateOsmosisProperties(iFactor, molality) {
+    const soluteCount = Math.round(iFactor * molality * 4.5);
+    const w = osmosisCanvas.width;
+    const h = osmosisCanvas.height;
+
+    // Filter out old solute particles
+    osmosisParticles = osmosisParticles.filter(p => p.type === 'water');
+
+    // Add new solute particles on the right side
+    const soluteColor = collSoluteSelect.value === 'Glucose' ? '#ffeaa7' : collSoluteSelect.value === 'NaCl' ? '#ff7675' : '#fd79a8';
+    for (let i = 0; i < soluteCount; i++) {
+      osmosisParticles.push(new OsmosisParticle(
+        Math.random() * (w - membraneX - 40) + membraneX + 20,
+        Math.random() * 100 + 190,
+        'solute',
+        soluteColor,
+        7,
+        'right'
+      ));
+    }
+
+    // Dynamically adjust TARGET levels based on concentration
+    // If no pressure applied, solution level rises, solvent falls.
+    const concentrationShift = molality * iFactor * 10;
+    if (osmoticPressureApplied) {
+      liquidLevels.targetLeft = 180;
+      liquidLevels.targetRight = 180;
     } else {
-      repFormula = `[${metalKey.substring(0,2).replace(/\d/g,'')}(${ligand.name})₄]<sup>${(metalCharge + (ligandCharge === 0 ? 0 : -4)) === -2 ? '2-' : (metalCharge + (ligandCharge === 0 ? 0 : -4)) === -1 ? '-' : '+' }</sup>`;
+      liquidLevels.targetLeft = 180 - concentrationShift;
+      liquidLevels.targetRight = 180 + concentrationShift;
     }
-    document.getElementById('res-formula').innerHTML = repFormula;
   }
 
-  function getSuperscript(num) {
-    const sups = {
-      '0': '⁰', '1': '¹', '2': '²', '3': '³', '4': '⁴', '5': '⁵', '6': '⁶', '7': '⁷', '8': '⁸', '9': '⁹', '10': '¹⁰'
-    };
-    return sups[num] || '';
-  }
+  function animateOsmosis() {
+    const w = osmosisCanvas.width;
+    const h = osmosisCanvas.height;
 
-  function renderOrbitalDiagram(geometry, configArray) {
-    if (geometry === 'octahedral') {
-      const egLevels = configArray[0];  // 2 orbitals
-      const t2gLevels = configArray[1]; // 3 orbitals
+    osmosisCtx.clearRect(0, 0, w, h);
 
-      // eg rendering
-      for (let i = 1; i <= 2; i++) {
-        const val = egLevels[i-1] || 0;
-        setElectronArrows(`oct-eg-${i}`, val);
+    // Smooth adjustment of liquid levels
+    liquidLevels.left += (liquidLevels.targetLeft - liquidLevels.left) * 0.05;
+    liquidLevels.right += (liquidLevels.targetRight - liquidLevels.right) * 0.05;
+
+    // Draw Liquid Backings
+    osmosisCtx.fillStyle = 'rgba(9, 132, 227, 0.08)';
+    // Left Chamber Fill
+    osmosisCtx.fillRect(0, h - liquidLevels.left, membraneX, liquidLevels.left);
+    // Right Chamber Fill
+    osmosisCtx.fillStyle = 'rgba(9, 132, 227, 0.15)';
+    osmosisCtx.fillRect(membraneX, h - liquidLevels.right, w - membraneX, liquidLevels.right);
+
+    // Draw Chambers borders
+    osmosisCtx.strokeStyle = 'rgba(255,255,255,0.15)';
+    osmosisCtx.lineWidth = 2;
+    osmosisCtx.strokeRect(0, 0, w, h);
+
+    // Draw Semi-Permeable Membrane (SPM) in middle (dashed line)
+    osmosisCtx.strokeStyle = '#00f2fe';
+    osmosisCtx.lineWidth = 3;
+    osmosisCtx.setLineDash([8, 8]);
+    osmosisCtx.beginPath();
+    osmosisCtx.moveTo(membraneX, 0);
+    osmosisCtx.lineTo(membraneX, h);
+    osmosisCtx.stroke();
+    osmosisCtx.setLineDash([]); // reset
+
+    // Draw Piston if Osmotic Pressure is Applied
+    if (osmoticPressureApplied) {
+      osmosisCtx.fillStyle = 'rgba(0, 242, 254, 0.3)';
+      osmosisCtx.strokeStyle = '#00f2fe';
+      osmosisCtx.lineWidth = 2;
+      // Draw piston plate pressing the right side fluid surface
+      const pistonY = h - liquidLevels.right - 10;
+      osmosisCtx.fillRect(membraneX + 4, pistonY, w - membraneX - 8, 12);
+      osmosisCtx.strokeRect(membraneX + 4, pistonY, w - membraneX - 8, 12);
+      
+      // Draw force indicator arrows pressing down
+      osmosisCtx.fillStyle = '#00f2fe';
+      osmosisCtx.font = 'bold 10px Inter, sans-serif';
+      osmosisCtx.textAlign = 'center';
+      osmosisCtx.fillText('APPLIED PRESSURE (P = Π)', (membraneX + w)/2, pistonY - 14);
+      
+      osmosisCtx.beginPath();
+      // Draw 3 down arrows
+      for (let offset = 40; offset < w - membraneX; offset += 80) {
+        let ax = membraneX + offset;
+        osmosisCtx.moveTo(ax, pistonY - 12);
+        osmosisCtx.lineTo(ax, pistonY - 2);
+        osmosisCtx.lineTo(ax - 4, pistonY - 6);
+        osmosisCtx.moveTo(ax, pistonY - 2);
+        osmosisCtx.lineTo(ax + 4, pistonY - 6);
       }
-      // t2g rendering
-      for (let i = 1; i <= 3; i++) {
-        const val = t2gLevels[i-1] || 0;
-        setElectronArrows(`oct-t2g-${i}`, val);
-      }
+      osmosisCtx.stroke();
+    }
+
+    // Update target levels depending on pressure applied state
+    const soluteKey = collSoluteSelect.value;
+    const molality = parseFloat(collMolalitySlider.value);
+    let iFactor = 1.0;
+    if (soluteKey === "NaCl") iFactor = 2.0;
+    if (soluteKey === "CaCl2") iFactor = 3.0;
+    const concentrationShift = molality * iFactor * 9;
+
+    if (osmoticPressureApplied) {
+      liquidLevels.targetLeft = 180;
+      liquidLevels.targetRight = 180;
     } else {
-      const t2Levels = configArray[0]; // 3 orbitals
-      const eLevels = configArray[1];  // 2 orbitals
-
-      // t2 rendering
-      for (let i = 1; i <= 3; i++) {
-        const val = t2Levels[i-1] || 0;
-        setElectronArrows(`tet-t2-${i}`, val);
-      }
-      // e rendering
-      for (let i = 1; i <= 2; i++) {
-        const val = eLevels[i-1] || 0;
-        setElectronArrows(`tet-e-${i}`, val);
-      }
+      liquidLevels.targetLeft = 180 - concentrationShift;
+      liquidLevels.targetRight = 180 + concentrationShift;
     }
-  }
 
-  function setElectronArrows(boxId, value) {
-    const box = document.getElementById(boxId);
-    if (!box) return;
-    const upArrow = box.querySelector('.spin-electron.up');
-    const downArrow = box.querySelector('.spin-electron.down');
-    
-    if (value === 0) {
-      upArrow.classList.add('hidden');
-      downArrow.classList.add('hidden');
-    } else if (value === 1) {
-      upArrow.classList.remove('hidden');
-      downArrow.classList.add('hidden');
-    } else if (value === 2) {
-      upArrow.classList.remove('hidden');
-      downArrow.classList.remove('hidden');
-    }
-  }
-
-  runCFTCalculation();
-
-
-  // ==========================================
-  // GAME 3: LIGAND CLASSIFICATION SORTER
-  // ==========================================
-  const sorterPool = [
-    { name: "chloride", symbol: "Cl⁻", category: "monodentate" },
-    { name: "water", symbol: "H₂O", category: "monodentate" },
-    { name: "ammine", symbol: "NH₃", category: "monodentate" },
-    { name: "ethane-1,2-diamine", symbol: "en", category: "bidentate" },
-    { name: "oxalate", symbol: "ox²⁻", category: "bidentate" },
-    { name: "ethylenediaminetetraacetate", symbol: "EDTA⁴⁻", category: "polydentate" },
-    { name: "nitrito-N", symbol: "NO₂⁻", category: "ambidentate" },
-    { name: "thiocyanato-S", symbol: "SCN⁻", category: "ambidentate" },
-    { name: "cyanide", symbol: "CN⁻", category: "ambidentate" },
-    { name: "carbonyl", symbol: "CO", category: "monodentate" },
-    { name: "hydroxido", symbol: "OH⁻", category: "monodentate" },
-    { name: "dimethylglyoximate", symbol: "dmg", category: "bidentate" }
-  ];
-
-  let sorterScore = 0;
-  let sorterHighScore = 0;
-  let sorterTime = 45;
-  let sorterInterval = null;
-  let currentSorterLigand = null;
-  let totalSorted = 0;
-  let correctSorted = 0;
-
-  const startScreen = document.getElementById('sorter-start-screen');
-  const activeScreen = document.getElementById('sorter-active-screen');
-  const endScreen = document.getElementById('sorter-end-screen');
-
-  document.getElementById('sorter-start-btn').addEventListener('click', startSorterGame);
-  document.getElementById('sorter-restart-btn').addEventListener('click', startSorterGame);
-
-  const bucketBtns = document.querySelectorAll('.bucket-btn');
-  bucketBtns.forEach(btn => {
-    btn.addEventListener('click', () => {
-      if (!currentSorterLigand) return;
-      const chosenCat = btn.getAttribute('data-category');
-      checkSortedAnswer(chosenCat, btn);
+    // Render particles
+    osmosisParticles.forEach(p => {
+      p.update(w, h, liquidLevels, osmoticPressureApplied);
+      p.draw(osmosisCtx);
     });
-  });
 
-  function resetSorterGameUI() {
-    clearInterval(sorterInterval);
-    startScreen.classList.remove('hidden');
-    activeScreen.style.opacity = '0.3';
-    activeScreen.style.pointerEvents = 'none';
-    endScreen.classList.add('hidden');
-    
-    document.getElementById('sort-score').innerText = '0';
-    document.getElementById('sort-timer').innerText = '45s';
+    osmosisAnimationId = requestAnimationFrame(animateOsmosis);
   }
 
-  function startSorterGame() {
-    sorterScore = 0;
-    totalSorted = 0;
-    correctSorted = 0;
-    sorterTime = 45;
-    
-    document.getElementById('sort-score').innerText = sorterScore;
-    document.getElementById('sort-timer').innerText = sorterTime + 's';
-    
-    startScreen.classList.add('hidden');
-    endScreen.classList.add('hidden');
-    activeScreen.style.opacity = '1';
-    activeScreen.style.pointerEvents = 'all';
+  function drawPhaseDiagram(dTf, dTb) {
+    const w = phaseCanvas.width;
+    const h = phaseCanvas.height;
 
-    loadNextSorterCard();
+    phaseCtx.clearRect(0, 0, w, h);
 
-    clearInterval(sorterInterval);
-    sorterInterval = setInterval(() => {
-      sorterTime--;
-      document.getElementById('sort-timer').innerText = sorterTime + 's';
-      
-      if (sorterTime <= 0) {
-        endSorterGame();
-      }
-    }, 1000);
+    const padding = 50;
+    const graphWidth = w - padding * 2;
+    const graphHeight = h - padding * 2;
+
+    // Draw Axes
+    phaseCtx.strokeStyle = 'rgba(255,255,255,0.15)';
+    phaseCtx.lineWidth = 2;
+    phaseCtx.beginPath();
+    // Y-Axis (Vapor Pressure)
+    phaseCtx.moveTo(padding, padding);
+    phaseCtx.lineTo(padding, h - padding);
+    // X-Axis (Temperature)
+    phaseCtx.moveTo(padding, h - padding);
+    phaseCtx.lineTo(w - padding, h - padding);
+    phaseCtx.stroke();
+
+    // Axis titles
+    phaseCtx.fillStyle = 'rgba(255,255,255,0.7)';
+    phaseCtx.font = '11px Inter, sans-serif';
+    phaseCtx.textAlign = 'center';
+    phaseCtx.fillText('Temperature (T) →', w/2, h - 12);
+    
+    // Vertical text for Y axis
+    phaseCtx.save();
+    phaseCtx.translate(14, h/2);
+    phaseCtx.rotate(-Math.PI / 2);
+    phaseCtx.fillText('Vapor Pressure (P) →', 0, 0);
+    phaseCtx.restore();
+
+    // 1. Atmosphere pressure line (1 atm horizontal line)
+    const atmY = padding + 50;
+    phaseCtx.strokeStyle = 'rgba(255, 234, 0, 0.25)';
+    phaseCtx.lineWidth = 1;
+    phaseCtx.setLineDash([4, 4]);
+    phaseCtx.beginPath();
+    phaseCtx.moveTo(padding, atmY);
+    phaseCtx.lineTo(w - padding, atmY);
+    phaseCtx.stroke();
+    phaseCtx.setLineDash([]);
+    phaseCtx.fillStyle = '#ffea00';
+    phaseCtx.font = '9px JetBrains Mono';
+    phaseCtx.fillText('1 atm pressure', w - padding - 50, atmY - 6);
+
+    // 2. Plot curves:
+    // Pure liquid solvent curves: curve upwards right.
+    // Liquid solution curves: curve upwards right, shifted down/right.
+    // Frozen solvent (solid curve): sharp descent left.
+    
+    // Solid line (sublimation line)
+    // From bottom left to triple point
+    const triX = padding + 150;
+    const triY = h - padding - 80;
+
+    phaseCtx.strokeStyle = '#8ca3ba';
+    phaseCtx.lineWidth = 2;
+    phaseCtx.beginPath();
+    phaseCtx.moveTo(padding + 20, h - padding - 20);
+    phaseCtx.quadraticCurveTo(triX - 60, triY - 30, triX, triY);
+    phaseCtx.stroke();
+    phaseCtx.fillStyle = '#8ca3ba';
+    phaseCtx.font = '9px Inter';
+    phaseCtx.fillText('Solid Solvent', triX - 70, triY + 20);
+
+    // Liquid Pure Solvent Curve (Blue)
+    phaseCtx.strokeStyle = '#00b0ff';
+    phaseCtx.lineWidth = 2.5;
+    phaseCtx.beginPath();
+    phaseCtx.moveTo(triX, triY);
+    // Curves up to boiling point intersection
+    const pureBoilX = triX + 180;
+    phaseCtx.quadraticCurveTo(pureBoilX - 70, atmY + 60, pureBoilX, atmY);
+    phaseCtx.quadraticCurveTo(pureBoilX + 30, atmY - 20, w - padding - 10, padding + 10);
+    phaseCtx.stroke();
+    phaseCtx.fillStyle = '#00b0ff';
+    phaseCtx.fillText('Pure Solvent', pureBoilX - 30, atmY + 70);
+
+    // Solution Liquid Curve (Purple dashed/dashed-solid)
+    // Solution sits below, shifted to the right. Shift amount proportional to dTb/dTf
+    const shiftScale = Math.min(22, dTf * 8);
+    const solBoilX = pureBoilX + shiftScale;
+    const solTriX = triX - shiftScale;
+    const solTriY = triY - (shiftScale * 0.4);
+
+    phaseCtx.strokeStyle = '#d500f9';
+    phaseCtx.lineWidth = 2;
+    phaseCtx.setLineDash([4, 3]);
+    phaseCtx.beginPath();
+    // Start slightly below triX on solid curve
+    phaseCtx.moveTo(solTriX, solTriY);
+    phaseCtx.quadraticCurveTo(solBoilX - 70, atmY + 75, solBoilX, atmY);
+    phaseCtx.quadraticCurveTo(solBoilX + 30, atmY - 15, w - padding - 5, padding + 20);
+    phaseCtx.stroke();
+    phaseCtx.setLineDash([]);
+    phaseCtx.fillStyle = '#d500f9';
+    phaseCtx.fillText('Solution', solBoilX - 25, atmY + 105);
+
+    // Draw Vertical intersection markers for Boiling Points
+    phaseCtx.strokeStyle = 'rgba(255,255,255,0.15)';
+    phaseCtx.lineWidth = 1;
+    
+    // T_b^0 (Pure boiling point)
+    phaseCtx.beginPath();
+    phaseCtx.moveTo(pureBoilX, atmY);
+    phaseCtx.lineTo(pureBoilX, h - padding);
+    phaseCtx.stroke();
+    phaseCtx.fillStyle = '#00b0ff';
+    phaseCtx.fillText('T_b°', pureBoilX, h - padding + 14);
+
+    // T_b (Solution boiling point)
+    phaseCtx.beginPath();
+    phaseCtx.moveTo(solBoilX, atmY);
+    phaseCtx.lineTo(solBoilX, h - padding);
+    phaseCtx.stroke();
+    phaseCtx.fillStyle = '#d500f9';
+    phaseCtx.fillText('T_b', solBoilX, h - padding + 14);
+
+    // Draw Vertical intersection markers for Freezing Points
+    // Triple point intersections: solid line crossing liquid curves
+    phaseCtx.beginPath();
+    phaseCtx.moveTo(triX, triY);
+    phaseCtx.lineTo(triX, h - padding);
+    phaseCtx.stroke();
+    phaseCtx.fillStyle = '#00b0ff';
+    phaseCtx.fillText('T_f°', triX, h - padding + 14);
+
+    phaseCtx.beginPath();
+    phaseCtx.moveTo(solTriX, solTriY);
+    phaseCtx.lineTo(solTriX, h - padding);
+    phaseCtx.stroke();
+    phaseCtx.fillStyle = '#d500f9';
+    phaseCtx.fillText('T_f', solTriX, h - padding + 14);
+
+    // Highlight shift intervals
+    // Boiling point shift
+    phaseCtx.strokeStyle = '#00f2fe';
+    phaseCtx.lineWidth = 1.5;
+    phaseCtx.beginPath();
+    phaseCtx.moveTo(pureBoilX, h - padding - 15);
+    phaseCtx.lineTo(solBoilX, h - padding - 15);
+    phaseCtx.stroke();
+    phaseCtx.fillStyle = '#00f2fe';
+    phaseCtx.fillText('ΔT_b', (pureBoilX + solBoilX)/2, h - padding - 22);
+
+    // Freezing point shift
+    phaseCtx.beginPath();
+    phaseCtx.moveTo(solTriX, h - padding - 15);
+    phaseCtx.lineTo(triX, h - padding - 15);
+    phaseCtx.stroke();
+    phaseCtx.fillText('ΔT_f', (solTriX + triX)/2, h - padding - 22);
   }
-
-  function loadNextSorterCard() {
-    const rand = Math.floor(Math.random() * sorterPool.length);
-    currentSorterLigand = sorterPool[rand];
-    
-    const cardSymbol = document.getElementById('card-symbol');
-    const cardName = document.getElementById('card-name');
-    
-    cardSymbol.innerText = currentSorterLigand.symbol;
-    cardName.innerText = currentSorterLigand.name;
-
-    // Reset card element animation/glow
-    const cardElement = document.getElementById('ligand-card');
-    cardElement.style.borderColor = 'var(--primary)';
-    cardElement.style.boxShadow = '0 10px 25px rgba(157, 78, 221, 0.25)';
-  }
-
-  function checkSortedAnswer(chosenCategory, buttonElement) {
-    totalSorted++;
-    const cardElement = document.getElementById('ligand-card');
-
-    if (chosenCategory === currentSorterLigand.category) {
-      // Correct!
-      sorterScore += 5;
-      correctSorted++;
-      document.getElementById('sort-score').innerText = sorterScore;
-      
-      // Flash card and bucket green
-      cardElement.style.borderColor = 'var(--success)';
-      cardElement.style.boxShadow = '0 0 20px rgba(0, 230, 118, 0.5)';
-      
-      setTimeout(loadNextSorterCard, 200);
-    } else {
-      // Incorrect. Deduct 2 seconds
-      sorterTime = Math.max(0, sorterTime - 2);
-      document.getElementById('sort-timer').innerText = sorterTime + 's';
-      
-      // Flash red
-      cardElement.style.borderColor = 'var(--error)';
-      cardElement.style.boxShadow = '0 0 20px rgba(255, 23, 68, 0.5)';
-      
-      buttonElement.style.borderColor = 'var(--error)';
-      setTimeout(() => {
-        buttonElement.style.borderColor = 'var(--glass-border)';
-      }, 500);
-
-      setTimeout(loadNextSorterCard, 200);
-    }
-
-    if (sorterScore >= 30) {
-      progressState.sorterHighScoreReached = true;
-      updateOverallProgress();
-    }
-  }
-
-  function endSorterGame() {
-    clearInterval(sorterInterval);
-    activeScreen.style.opacity = '0.3';
-    activeScreen.style.pointerEvents = 'none';
-    
-    if (sorterScore > sorterHighScore) {
-      sorterHighScore = sorterScore;
-      document.getElementById('sort-highscore').innerText = sorterHighScore;
-    }
-    
-    document.getElementById('final-sorted-count').innerText = correctSorted;
-    const accuracy = totalSorted > 0 ? Math.round((correctSorted / totalSorted) * 100) : 0;
-    document.getElementById('sort-accuracy').innerText = accuracy + '%';
-    
-    endScreen.classList.remove('hidden');
-  }
-
 
   // ==========================================
-  // GAME 4: 25-QUESTION MASTERY QUIZ
+  // QUIZ ENGINE (25 NCERT SOLUTIONS QUESTIONS)
   // ==========================================
   const quizQuestions = [
     {
-      question: "Which of the following describes the fundamental difference between Mohr's Salt and Potassium Ferrocyanide?",
+      question: "Which of the following units of concentration is independent of temperature?",
       options: [
-        "Mohr's salt is a complex compound while potassium ferrocyanide is a double salt",
-        "Mohr's salt dissociates completely into simple Fe²⁺, NH₄⁺ and SO₄²⁻ ions in water, while potassium ferrocyanide retains the complex [Fe(CN)₆]⁴⁻ ion",
-        "Potassium ferrocyanide gives test for individual Fe²⁺ and CN⁻ ions in aqueous solution",
-        "Mohr's salt is a coordination compound while potassium ferrocyanide is a hydrated salt"
+        "Molarity (M)",
+        "Molality (m)",
+        "Normality (N)",
+        "Mass by volume percentage (w/V)"
       ],
       correct: 1,
-      explanation: "Mohr's Salt is a double salt [FeSO₄·(NH₄)₂SO₄·6H₂O] which dissociates completely in water. Potassium Ferrocyanide K₄[Fe(CN)₆] is a coordination compound; the complex entity [Fe(CN)₆]⁴⁻ does not dissociate into Fe²⁺ and CN⁻ ions."
+      explanation: "Molality (m) is defined as the moles of solute per kilogram of solvent. Since mass does not change with temperature, molality is temperature independent. Molarity and Normality depend on solution volume, which expands/contracts with temperature."
     },
     {
-      question: "According to Werner's theory, how many moles of AgCl precipitate will be formed when 1 mole of [Co(NH₃)₅Cl]Cl₂ is treated with excess AgNO₃ solution?",
+      question: "What is the mole fraction of ethylene glycol (\(\text{C}_2\text{H}_6\text{O}_2\)) in a solution containing 20% of ethylene glycol by mass in water?",
       options: [
-        "1 mole",
-        "2 moles",
-        "3 moles",
-        "0 moles"
-      ],
-      correct: 1,
-      explanation: "In [Co(NH₃)₅Cl]Cl₂, two chloride ions lie outside the coordination sphere as primary valencies and are ionizable. Treating with AgNO₃ precipitates these as 2 moles of AgCl."
-    },
-    {
-      question: "What is the primary valency and secondary valency of the metal in the complex [Co(NH₃)₆]Cl₃ respectively?",
-      options: [
-        "Primary = 6, Secondary = 3",
-        "Primary = 3, Secondary = 6",
-        "Primary = 3, Secondary = 3",
-        "Primary = 6, Secondary = 6"
-      ],
-      correct: 1,
-      explanation: "Primary valency corresponds to the oxidation state of the central metal (+3 here, as it balances 3 Cl⁻). Secondary valency corresponds to the coordination number (6 ligands coordinated to Co³⁺)."
-    },
-    {
-      question: "Identify the ambidentate ligand from the following options:",
-      options: [
-        "C₂O₄²⁻ (oxalate)",
-        "H₂O (aqua)",
-        "SCN⁻ (thiocyanato)",
-        "en (ethane-1,2-diamine)"
-      ],
-      correct: 2,
-      explanation: "An ambidentate ligand has two different donor atoms and can coordinate through either of them. SCN⁻ can coordinate via sulfur (-SCN) or nitrogen (-NCS)."
-    },
-    {
-      question: "What is the denticity and charge of the ligand EDTA respectively?",
-      options: [
-        "Hexadentate and -4",
-        "Tetradentate and -2",
-        "Hexadentate and -2",
-        "Bidentate and -4"
+        "0.068",
+        "0.032",
+        "0.168",
+        "0.932"
       ],
       correct: 0,
-      explanation: "EDTA⁴⁻ (ethylenediaminetetraacetate) is a hexadentate ligand (can donate six lone pairs via 2 nitrogen and 4 oxygen atoms) and carries a charge of -4."
+      explanation: "Assume 100g solution: Mass of glycol = 20g (moles = 20/62 = 0.322 mol). Mass of water = 80g (moles = 80/18 = 4.444 mol). Mole fraction of glycol \(\chi = \frac{0.322}{0.322 + 4.444} = 0.068\)."
     },
     {
-      question: "Which of the following ligands forms a chelate ring with a transition metal ion?",
+      question: "Which type of solution is represented by a mixture of nitrogen gas and oxygen gas?",
       options: [
-        "Cl⁻",
-        "en (ethane-1,2-diamine)",
-        "CN⁻",
-        "NH₃"
+        "Gas in Liquid solution",
+        "Gas in Gas solution",
+        "Liquid in Gas solution",
+        "Solid in Gas solution"
       ],
       correct: 1,
-      explanation: "Di- or polydentate ligands like ethane-1,2-diamine (en) coordinate through multiple donor atoms to form a stable ring structure known as a chelate ring."
+      explanation: "Air, which is a homogeneous mixture of nitrogen and oxygen gases, represents a gas-in-gas solution since both the solute and solvent are in the gaseous state."
     },
     {
-      question: "What is the coordination number of Fe in K₃[Fe(C₂O₄)₃]?",
+      question: "Which of the following statements about Henry's Law constant (\(K_H\)) is correct?",
       options: [
-        "3",
-        "6",
-        "4",
-        "9"
+        "Higher the value of \(K_H\) at a given pressure, the higher is the solubility of the gas.",
+        "Higher the value of \(K_H\) at a given pressure, the lower is the solubility of the gas.",
+        "\(K_H\) value is constant for all gases and is independent of temperature.",
+        "\(K_H\) value decreases with an increase in temperature."
       ],
       correct: 1,
-      explanation: "Oxalate (C₂O₄²⁻) is a bidentate ligand. Since there are three oxalate ligands, the coordination number is 3 &times; 2 = 6."
+      explanation: "According to Henry's Law, \(p = K_H \cdot \chi\), or \(\chi = p / K_H\). Therefore, at a given partial pressure, a larger Henry's constant (\(K_H\)) corresponds to a smaller mole fraction (\(\chi\)) of gas in solution, meaning lower solubility."
     },
     {
-      question: "Determine the oxidation state of the central metal atom in the complex [Co(NH₃)₅(CO₃)]Cl.",
+      question: "Why are aquatic species more comfortable in cold water than in warm water?",
       options: [
-        "+2",
-        "+3",
-        "+4",
-        "+1"
-      ],
-      correct: 1,
-      explanation: "Calculation: x + 5(0) [NH₃] + 1(-2) [CO₃²⁻] = +1 (as counter chloride is -1) &rArr; x - 2 = +1 &rArr; x = +3."
-    },
-    {
-      question: "What is the correct IUPAC name for K₃[Fe(CN)₆]?",
-      options: [
-        "Potassium hexacyanoiron(III)",
-        "Tripotassium hexacyanidoferrate(III)",
-        "Potassium hexacyanidoferrate(III)",
-        "Potassium hexacyanidoferrate(II)"
+        "Solubility of oxygen gas increases with an increase in temperature.",
+        "Solubility of oxygen gas decreases with a decrease in temperature.",
+        "Solubility of oxygen gas increases with a decrease in temperature (cold water).",
+        "Henry's law constant (\(K_H\)) decreases as temperature increases."
       ],
       correct: 2,
-      explanation: "The cation is Potassium (no prefixes like tripotassium). The complex is anionic so Iron ends in -ate (ferrate). CN⁻ is named cyanido. Oxidation state is +3 (3(+1) + x + 6(-1) = 0 &rArr; x = +3). Thus: potassium hexacyanidoferrate(III)."
+      explanation: "Gas dissolution in water is an exothermic process (\(\Delta H < 0\)). According to Le Chatelier's principle, lowering temperature shifts equilibrium to favor dissolution. Thus, oxygen dissolves more in cold water (lower \(K_H\)), making aquatic life comfortable."
     },
     {
-      question: "What is the correct IUPAC name of the complex [Pt(NH₃)₂Cl(NH₂CH₃)]Cl?",
+      question: "Scuba divers carry tanks diluted with Helium (11.7% He, 56.2% N₂, 32.1% O₂) to avoid which medical condition?",
       options: [
-        "Diamminechlorido(methylamine)platinum(II) chloride",
-        "Diamminechloridomethylamineplatinum(IV) chloride",
-        "Diamminechlorido(methylamine)platinate(II) chloride",
-        "Chloridodiammine(methylamine)platinum(II) chloride"
-      ],
-      correct: 0,
-      explanation: "Ligands are named alphabetically: ammine (NH₃) before chlorido (Cl⁻) before methylamine (NH₂CH₃). The complex sphere is cationic, so the metal name is platinum. The oxidation state is +2. Thus: diamminechlorido(methylamine)platinum(II) chloride."
-    },
-    {
-      question: "Why do tetrahedral complexes not show geometrical isomerism?",
-      options: [
-        "Tetrahedral complexes are optically active",
-        "All four coordination positions in a tetrahedral geometry are adjacent to one another (equal relative positions)",
-        "They only contain monodentate ligands",
-        "The ligands cannot be arranged in cis/trans forms due to the high stability of d-orbitals"
+        "Anoxia",
+        "Bends (decompression sickness)",
+        "Acidosis",
+        "Hyperventilation"
       ],
       correct: 1,
-      explanation: "In a tetrahedral complex, all four positions are equivalent and adjacent to each other. Hence, no cis/trans isomers are possible."
+      explanation: "At high underwater pressure, nitrogen dissolves heavily in blood. When diving back up, pressure drops and dissolved nitrogen forms painful, dangerous bubbles in blood capillaries (Bends). Diluting with low-solubility Helium prevents this."
     },
     {
-      question: "Which of the following octahedral complexes exhibits fac-mer (facial-meridional) geometrical isomerism?",
+      question: "At high altitudes, low partial pressure of oxygen leads to low concentration of oxygen in blood, causing breathing struggles and confusion. This condition is called:",
       options: [
-        "[Co(NH₃)₄Cl₂]⁺",
-        "[Co(en)₃]³⁺",
-        "[Co(NH₃)₃(NO₂)₃]",
-        "[Pt(NH₃)₂Cl₂]"
+        "Bends",
+        "Anoxia",
+        "Asphyxia",
+        "Anaemia"
+      ],
+      correct: 1,
+      explanation: "At high altitudes, the partial pressure of oxygen is less than that at ground level. This leads to low oxygen levels in tissues and blood of climbers, resulting in weakness and inability to think clearly—a condition known as Anoxia."
+    },
+    {
+      question: "If two liquids A and B form an ideal solution, which of the following thermodynamic relations is true?",
+      options: [
+        "\(\Delta H_{\text{mix}} > 0, \Delta V_{\text{mix}} > 0\)",
+        "\(\Delta H_{\text{mix}} < 0, \Delta V_{\text{mix}} < 0\)",
+        "\(\Delta H_{\text{mix}} = 0, \Delta V_{\text{mix}} = 0\)",
+        "\(\Delta S_{\text{mix}} = 0, \Delta G_{\text{mix}} = 0\)"
       ],
       correct: 2,
-      explanation: "Fac-mer isomerism occurs in octahedral complexes of the formula [Ma₃b₃], such as [Co(NH₃)₃(NO₂)₃]."
+      explanation: "For an ideal solution, molecules are perfectly interchangeable without heat exchange or volume change upon mixing. Thus, \(\Delta H_{\text{mix}} = 0\) and \(\Delta V_{\text{mix}} = 0\). (Note: entropy \(\Delta S_{\text{mix}} > 0\) and free energy \(\Delta G_{\text{mix}} < 0\) for spontaneous mixing)."
     },
     {
-      question: "Which of the following isomers of [Co(en)₂Cl₂]⁺ is optically active and why?",
+      question: "A mixture of Chloroform and Acetone shows negative deviation from Raoult's Law. Why?",
       options: [
-        "The trans isomer because it has a plane of symmetry",
-        "The cis isomer because it lacks a plane of symmetry (chiral)",
-        "Both cis and trans isomers are optically active",
-        "Neither isomer is active because chloride is a weak field ligand"
+        "Chloroform-Acetone interactions are weaker than Chloroform-Chloroform and Acetone-Acetone attractions.",
+        "Chloroform and Acetone form a stable maximum-boiling azeotrope by creating strong intermolecular hydrogen bonds.",
+        "The heat of mixing is endothermic (\(\Delta H > 0\)).",
+        "Molecules of acetone escape faster because of steric hindrance."
       ],
       correct: 1,
-      explanation: "The cis-[Co(en)₂Cl₂]⁺ isomer is chiral and has non-superimposable mirror images. The trans isomer has a plane of symmetry, making it achiral and optically inactive."
+      explanation: "Chloroform (\(\text{CHCl}_3\)) and Acetone (\(\text{CH}_3\text{COCH}_3\)) form strong intermolecular hydrogen bonds between the H of chloroform and the O of acetone. This cohesive attraction reduces escaping tendency, depressing vapor pressure below ideal levels (Negative deviation)."
     },
     {
-      question: "What type of isomerism is shown by the complexes [Co(NH₃)₅(NO₂)]Cl₂ and [Co(NH₃)₅(ONO)]Cl₂?",
+      question: "An azeotropic mixture of two liquids boils at a lower temperature than either of them when the solution shows:",
       options: [
-        "Ionisation isomerism",
-        "Coordination isomerism",
-        "Linkage isomerism",
-        "Solvate isomerism"
+        "Negative deviation from Raoult's law",
+        "Positive deviation from Raoult's law",
+        "No deviation (Ideal behavior)",
+        "High degree of association between solute particles"
+      ],
+      correct: 1,
+      explanation: "Solutions displaying positive deviations from Raoult's law have higher vapor pressures than expected. At a specific composition, the vapor pressure reaches its maximum. Thus, the boiling point drops to a minimum (minimum-boiling azeotrope)."
+    },
+    {
+      question: "Which of the following binary mixtures is an example of positive deviation from Raoult's Law?",
+      options: [
+        "Nitric acid + Water",
+        "Phenol + Aniline",
+        "Ethanol + Acetone",
+        "Chloroform + Benzene"
       ],
       correct: 2,
-      explanation: "These complexes differ in the bonding mode of the ambidentate nitrite ligand (NO₂⁻ linked via N vs ONO⁻ linked via O), which represents linkage isomerism."
+      explanation: "In pure ethanol, molecules are hydrogen-bonded. Adding acetone inserts acetone molecules between ethanol clusters, breaking some hydrogen bonds. Escaping tendency increases, yielding a positive deviation from Raoult's Law."
     },
     {
-      question: "The complexes [Co(NH₃)₆][Cr(CN)₆] and [Cr(NH₃)₆][Co(CN)₆] are examples of which isomerism?",
+      question: "Which of the following is NOT a colligative property?",
       options: [
-        "Ionisation isomerism",
-        "Coordination isomerism",
-        "Linkage isomerism",
-        "Geometrical isomerism"
-      ],
-      correct: 1,
-      explanation: "Coordination isomerism involves exchange of ligands between the cationic and anionic coordination spheres of different metal ions."
-    },
-    {
-      question: "Which test can chemically distinguish between [Co(NH₃)₅SO₄]Br and [Co(NH₃)₅Br]SO₄?",
-      options: [
-        "[Co(NH₃)₅SO₄]Br gives a white precipitate with BaCl₂",
-        "[Co(NH₃)₅Br]SO₄ gives a white precipitate with BaCl₂ and [Co(NH₃)₅SO₄]Br gives a pale yellow precipitate with AgNO₃",
-        "Both give precipitates with AgNO₃",
-        "[Co(NH₃)₅Br]SO₄ gives a pale yellow precipitate with AgNO₃"
-      ],
-      correct: 1,
-      explanation: "[Co(NH₃)₅SO₄]Br dissociates to give Br⁻, which reacts with AgNO₃ to give pale yellow AgBr. [Co(NH₃)₅Br]SO₄ gives SO₄²⁻, which reacts with BaCl₂ to give white BaSO₄. This is ionisation isomerism."
-    },
-    {
-      question: "According to Valence Bond Theory, what is the hybridization and magnetic nature of the octahedral complex [Cr(NH₃)₆]³⁺?",
-      options: [
-        "sp³d² and paramagnetic",
-        "d²sp³ and paramagnetic",
-        "d²sp³ and diamagnetic",
-        "sp³d² and diamagnetic"
-      ],
-      correct: 1,
-      explanation: "Chromium in +3 state is d³. It has three unpaired electrons in t2g. Because it has two empty inner 3d orbitals (since it's d³), it undergoes d²sp³ hybridization. With 3 unpaired electrons, it is paramagnetic."
-    },
-    {
-      question: "What is the hybridization and magnetic nature of [Ni(CN)₄]²⁻?",
-      options: [
-        "sp³ and diamagnetic",
-        "dsp² and paramagnetic",
-        "dsp² and diamagnetic",
-        "sp³ and paramagnetic"
-      ],
-      correct: 2,
-      explanation: "Ni²⁺ is d⁸. CN⁻ is a strong field ligand, which forces the 8 electrons to pair up, leaving one empty 3d orbital. This empty orbital participates in dsp² hybridization, giving a square planar, diamagnetic complex."
-    },
-    {
-      question: "What is the hybridization and shape of [Ni(CO)₄]?",
-      options: [
-        "dsp² and square planar",
-        "sp³d² and octahedral",
-        "sp³ and tetrahedral",
-        "d²sp³ and octahedral"
-      ],
-      correct: 2,
-      explanation: "In [Ni(CO)₄], nickel is in 0 oxidation state (d⁸s²). CO is a very strong ligand and forces the 4s electrons to pair into 3d, making it d¹⁰. The empty 4s and 4p orbitals hybridize as sp³, forming a tetrahedral diamagnetic geometry."
-    },
-    {
-      question: "According to Crystal Field Theory, what is the splitting pattern of d-orbitals in an octahedral coordination field?",
-      options: [
-        "t₂g set (lower energy) and eg set (higher energy)",
-        "eg set (lower energy) and t₂g set (higher energy)",
-        "t₂ set (lower energy) and e set (higher energy)",
-        "All 5 d-orbitals remain degenerate"
-      ],
-      correct: 0,
-      explanation: "In an octahedral field, the ligands approach along the axes. Orbitals pointing along the axes (dx²-y², dz²) experience more repulsion and form the higher energy eg set, while those pointing between axes (dxy, dyz, dxz) form the lower energy t2g set."
-    },
-    {
-      question: "How is the splitting energy of a tetrahedral field (Δₜ) related to that of an octahedral field (Δₒ)?",
-      options: [
-        "Δₜ = Δₒ",
-        "Δₜ = (4/9) Δₒ",
-        "Δₜ = (9/4) Δₒ",
-        "Δₜ = (2/3) Δₒ"
-      ],
-      correct: 1,
-      explanation: "Because there are only 4 ligands in tetrahedral vs 6 in octahedral and they do not point directly at the orbitals, the splitting is smaller: Δₜ = (4/9) Δₒ."
-    },
-    {
-      question: "Which of the following represents the correct configuration of a d⁵ metal ion in an octahedral field with a strong field ligand (Δₒ > P)?",
-      options: [
-        "t₂g³ eg²",
-        "t₂g⁵ eg⁰",
-        "t₂g⁴ eg¹",
-        "e⁴ t₂¹"
-      ],
-      correct: 1,
-      explanation: "With a strong field ligand, Δₒ > P, meaning the pairing energy is low. Hence, all 5 electrons pair up in the lower t2g level before entering eg: t₂g⁵ eg⁰."
-    },
-    {
-      question: "Which of the following ligands has the highest crystal field splitting power (field strength) in the spectrochemical series?",
-      options: [
-        "H₂O",
-        "Cl⁻",
-        "CN⁻",
-        "CO"
+        "Relative lowering of vapor pressure",
+        "Elevation of boiling point",
+        "Depression of freezing point",
+        "Vapor pressure of liquid"
       ],
       correct: 3,
-      explanation: "According to the spectrochemical series, CO has the highest splitting power due to strong synergic &pi;-backbonding, followed by CN⁻."
+      explanation: "Vapor pressure is a bulk physical property of a liquid. Colligative properties are *relative changes* (relative lowering of vapor pressure, elevation of boiling point, depression of freezing point, osmotic pressure) that depend only on solute particle count."
     },
     {
-      question: "Calculate the Crystal Field Stabilization Energy (CFSE) for a d⁶ octahedral complex with a strong field ligand.",
+      question: "When a non-volatile solute is dissolved in a solvent, the vapor pressure of the solution decreases because:",
       options: [
-        "-0.4 Δₒ",
-        "-2.4 Δₒ + 3P",
-        "-2.4 Δₒ",
-        "-1.2 Δₒ"
+        "Solute particles block escaping pathways on the surface layer of the liquid.",
+        "Solute molecules possess higher kinetic energy than solvent molecules.",
+        "Dissolution is always exothermic.",
+        "The boiling point of the solution is decreased."
       ],
-      correct: 1,
-      explanation: "Strong field d⁶ is t₂g⁶ eg⁰. Energy is 6 &times; (-0.4 Δₒ) + 3P (since 3 pairs are formed) = -2.4 Δₒ + 3P. (Note: sometimes written as -2.4 Δₒ relative to the barycenter)."
+      correct: 0,
+      explanation: "In a solution, non-volatile solute particles occupy surface area sites. This reduces the surface fraction of volatile solvent molecules, thereby decreasing the rate at which solvent molecules escape into the vapor phase, lowering vapor pressure."
     },
     {
-      question: "Which metal ion is present in Vitamin B₁₂?",
+      question: "Which colligative property is preferred for determining the molar masses of proteins, polymers, and biomolecules, and why?",
       options: [
-        "Iron (Fe)",
-        "Cobalt (Co)",
-        "Magnesium (Mg)",
-        "Zinc (Zn)"
+        "Depression of freezing point because biomolecules are stable at low temperatures.",
+        "Osmotic pressure because measurements are taken at room temperature and produce large, easily measurable values even for dilute solutions.",
+        "Elevation of boiling point because boiling speeds up reaction kinetics.",
+        "Relative lowering of vapor pressure because it does not require temperature control."
       ],
       correct: 1,
-      explanation: "Vitamin B₁₂ (cyanocobalamin) is a coordination complex containing Cobalt (Co³⁺). Chlorophyll contains Magnesium (Mg²⁺) and Hemoglobin contains Iron (Fe²⁺)."
+      explanation: "Biomolecules are often unstable at high temperatures (preventing ebulliometry) and have low solubility. Osmotic pressure (\(\Pi = CRT\)) uses molarity instead of molality, is measured at room temperature, and produces significant measurable readings even for tiny concentrations of macromolecular solutes."
+    },
+    {
+      question: "If a pressure greater than osmotic pressure is applied on the solution side of an osmosis cell, what happens?",
+      options: [
+        "Osmosis stops completely, reaching static equilibrium.",
+        "Solute particles start migrating through the membrane to the pure solvent.",
+        "Solvent molecules flow from the solution side (high conc.) to the pure solvent side (low conc.) - Reverse Osmosis.",
+        "The semi-permeable membrane ruptures due to hydrostatic pressure."
+      ],
+      correct: 2,
+      explanation: "Applying pressure higher than osmotic pressure (\(P > \Pi\)) forces solvent molecules to migrate backwards through the SPM from the solution to the pure solvent chamber. This is Reverse Osmosis (RO), widely used for water desalination."
+    },
+    {
+      question: "What is the expected van 't Hoff factor (\(i\)) for complete dissociation of Potassium Sulfate (\(\text{K}_2\text{SO}_4\))?",
+      options: [
+        "1",
+        "2",
+        "3",
+        "4"
+      ],
+      correct: 2,
+      explanation: "Potassium sulfate dissociates completely as: \(\text{K}_2\text{SO}_4 \rightarrow 2\text{K}^+ + \text{SO}_4^{2-}\). Total ions formed = 3. For complete dissociation, \(i = n = 3\)."
+    },
+    {
+      question: "Ethanoic acid dimerizes in benzene. What is the value of the van 't Hoff factor (\(i\)) assuming 100% association?",
+      options: [
+        "1.0",
+        "2.0",
+        "0.5",
+        "0.25"
+      ],
+      correct: 2,
+      explanation: "Ethanoic acid undergoes association to form dimers: \(2\text{CH}_3\text{COOH} \rightarrow (\text{CH}_3\text{COOH})_2\). Two molecules pair up into one. For complete dimerization, the number of particles is cut in half, so \(i = 1/2 = 0.5\)."
+    },
+    {
+      question: "The molal elevation constant (\(K_b\)) is also known as:",
+      options: [
+        "Cryoscopic constant",
+        "Ebullioscopic constant",
+        "Henry's constant",
+        "van 't Hoff constant"
+      ],
+      correct: 1,
+      explanation: "The molal elevation constant (\(K_b\)) which represents the boiling point elevation of a 1 molal solution is referred to as the Ebullioscopic constant. The freezing point constant (\(K_f\)) is called the Cryoscopic constant."
+    },
+    {
+      question: "A 0.1 molal aqueous solution of Glucose and a 0.1 molal aqueous solution of NaCl are prepared. Which statement is correct?",
+      options: [
+        "Both solutions freeze at the same temperature.",
+        "The NaCl solution will exhibit roughly double the freezing point depression (\(\Delta T_f\)) of the Glucose solution.",
+        "The Glucose solution will freeze at a lower temperature than the NaCl solution.",
+        "NaCl is a non-electrolyte, so its boiling point elevation is zero."
+      ],
+      correct: 1,
+      explanation: "Glucose is a non-electrolyte (\(i=1\)). NaCl dissociates into 2 ions (\(i=2\)). Since colligative properties depend on the total concentration of particles, \(\Delta T_f(\text{NaCl}) = 2 \times \Delta T_f(\text{Glucose})\). Thus, NaCl depresses freezing point twice as much, freezing at a lower temperature."
+    },
+    {
+      question: "If red blood cells (RBCs) are placed in a saline solution containing 1.5% NaCl, what happens to the cells and why?",
+      options: [
+        "They remain intact because 1.5% NaCl is isotonic to blood plasma fluid.",
+        "They swell and burst because the external solution is hypotonic, making water enter the cells.",
+        "They shrink (plasmolysis) because the external solution is hypertonic, causing water to flow out of the cells.",
+        "They absorb salt particles and double in weight."
+      ],
+      correct: 2,
+      explanation: "Blood plasma fluid is isotonic with 0.9% (w/V) NaCl solution. A 1.5% NaCl solution is hypertonic (more concentrated). Water leaves the RBCs via osmosis to equalize concentration, causing the cells to shrink."
+    },
+    {
+      question: "An electrolyte AB₂ is 60% dissociated in water. What is its van 't Hoff factor (\(i\))?",
+      options: [
+        "1.20",
+        "2.20",
+        "3.00",
+        "1.80"
+      ],
+      correct: 1,
+      explanation: "\(\text{AB}_2 \rightarrow \text{A}^{2+} + 2\text{B}^-\) (number of ions \(n = 3\)). Dissociation formula: \(i = 1 + (n - 1)\alpha\). With \(\alpha = 0.60\): \(i = 1 + (3 - 1)(0.60) = 1 + 2(0.60) = 2.20\)."
+    },
+    {
+      question: "How is the observed molar mass of a solute related to its normal molar mass if it undergoes association in solution?",
+      options: [
+        "Observed molar mass is equal to normal molar mass.",
+        "Observed molar mass is higher than normal molar mass.",
+        "Observed molar mass is lower than normal molar mass.",
+        "Observed molar mass becomes zero."
+      ],
+      correct: 1,
+      explanation: "Association reduces the number of particles in solution, making the observed colligative property smaller. Since colligative properties are inversely proportional to molar mass, a smaller property value results in an abnormally high calculated (observed) molar mass."
+    },
+    {
+      question: "The vapor pressure of pure liquid A at 298 K is 100 bar. When a non-volatile solute B is added, the vapor pressure of the solution drops to 80 bar. What is the mole fraction of solute B?",
+      options: [
+        "0.20",
+        "0.80",
+        "0.50",
+        "0.10"
+      ],
+      correct: 0,
+      explanation: "Relative lowering of vapor pressure: \(\frac{p^0 - p}{p^0} = \chi_{\text{solute}}\). Here, \(\frac{100 - 80}{100} = \frac{20}{100} = 0.20\). So mole fraction of solute B is 0.20."
+    },
+    {
+      question: "What happens to the vapor pressure of water when a spoonful of common salt (NaCl) is added to it at constant temperature?",
+      options: [
+        "Vapor pressure increases.",
+        "Vapor pressure decreases.",
+        "Vapor pressure remains unchanged.",
+        "Water boils instantly."
+      ],
+      correct: 1,
+      explanation: "NaCl is a non-volatile solute. Adding it to water decreases the fraction of surface area occupied by volatile water molecules, thus lowering the vapor pressure of the solution."
+    },
+    {
+      question: "For a dilute solution, the elevation of boiling point (\(\Delta T_b\)) is directly proportional to:",
+      options: [
+        "Molarity of the solute",
+        "Mole fraction of the solvent",
+        "Molality of the solute",
+        "Volume of the solvent in mL"
+      ],
+      correct: 2,
+      explanation: "Under thermodynamics and NCERT definitions, the boiling point elevation \(\Delta T_b\) of a dilute solution is directly proportional to the molality (m) of the solute in the solution: \(\Delta T_b = K_b \cdot m\)."
     }
   ];
 
   let currentQuizIndex = 0;
   let quizScore = 0;
   let selectedOption = null;
+
+  const quizStartScreen = document.getElementById('quiz-start-screen');
+  const quizQuestionScreen = document.getElementById('quiz-question-screen');
+  const quizSummaryScreen = document.getElementById('quiz-summary-screen');
+  const studentNameInput = document.getElementById('student-name');
+  const nameErrorMsg = document.getElementById('name-error-msg');
+
+  // Start Quiz Button
+  document.getElementById('quiz-start-btn').addEventListener('click', () => {
+    const name = studentNameInput.value.trim();
+    if (name === "") {
+      nameErrorMsg.classList.remove('hidden');
+      studentNameInput.focus();
+      return;
+    }
+
+    nameErrorMsg.classList.add('hidden');
+    progressState.studentName = name;
+    
+    quizStartScreen.classList.add('hidden');
+    quizQuestionScreen.classList.remove('hidden');
+    
+    currentQuizIndex = 0;
+    quizScore = 0;
+    loadQuizQuestion();
+  });
 
   function loadQuizQuestion() {
     const q = quizQuestions[currentQuizIndex];
@@ -1093,6 +1426,9 @@ document.addEventListener('DOMContentLoaded', () => {
       });
       optionsContainer.appendChild(btn);
     });
+
+    // Re-typeset math formulas for the new question & options
+    triggerMathJax();
   }
 
   function selectQuizOption(index, buttonElement) {
@@ -1109,13 +1445,11 @@ document.addEventListener('DOMContentLoaded', () => {
     allButtons.forEach(btn => btn.disabled = true);
 
     if (index === q.correct) {
-      // Correct answer
       quizScore++;
       buttonElement.classList.add('correct');
       feedbackStatus.innerText = "Correct! 🎉";
       feedbackStatus.className = "feedback-status correct";
     } else {
-      // Incorrect answer
       buttonElement.classList.add('incorrect');
       allButtons[q.correct].classList.add('correct');
       feedbackStatus.innerText = "Incorrect ❌";
@@ -1125,7 +1459,10 @@ document.addEventListener('DOMContentLoaded', () => {
     feedbackExplanation.innerHTML = q.explanation;
     feedbackBox.classList.remove('hidden');
 
-    // Smooth scroll to explanation if screen is small
+    // Re-typeset math formulas for the explanation box
+    triggerMathJax();
+
+    // Smooth scroll to explanation
     feedbackBox.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
   }
 
@@ -1144,106 +1481,117 @@ document.addEventListener('DOMContentLoaded', () => {
     progressState.quizScore = quizScore;
     updateOverallProgress();
 
-    document.getElementById('quiz-question-screen').classList.add('hidden');
-    const summaryScreen = document.getElementById('quiz-summary-screen');
-    summaryScreen.classList.remove('hidden');
+    quizQuestionScreen.classList.add('hidden');
+    quizSummaryScreen.classList.remove('hidden');
 
     document.getElementById('summary-score').innerText = `${quizScore} / 25`;
     const accuracy = Math.round((quizScore / 25) * 100);
     document.getElementById('summary-accuracy').innerText = accuracy + '%';
 
     // Grade logic
-    let grade = "Keep Learning";
-    if (accuracy >= 90) grade = "Outstanding (A+)";
-    else if (accuracy >= 75) grade = "Excellent (A)";
-    else if (accuracy >= 55) grade = "Good (B)";
+    let grade = "Average (Keep Learning)";
+    if (accuracy >= 90) grade = "Outstanding Academic Excellence (A+)";
+    else if (accuracy >= 75) grade = "Excellent Master Grade (A)";
+    else if (accuracy >= 55) grade = "Good Passing Grade (B)";
     document.getElementById('summary-grade').innerText = grade;
 
     // Draw Certificate
-    generateCertificate(quizScore);
+    generateCertificate(quizScore, accuracy, progressState.studentName);
   }
 
   // Restart Quiz
   document.getElementById('quiz-restart-btn').addEventListener('click', () => {
-    currentQuizIndex = 0;
-    quizScore = 0;
-    document.getElementById('quiz-question-screen').classList.remove('hidden');
-    document.getElementById('quiz-summary-screen').classList.add('hidden');
-    loadQuizQuestion();
+    quizSummaryScreen.classList.add('hidden');
+    quizStartScreen.classList.remove('hidden');
   });
 
-  function generateCertificate(score) {
+  function generateCertificate(score, accuracy, name) {
     const canvas = document.getElementById('certificate-canvas');
     const ctx = canvas.getContext('2d');
 
-    // Draw background
-    ctx.fillStyle = '#0f0c1b';
-    ctx.fillRect(0, 0, 600, 400);
+    // Draw premium certificate background (Deep Slate Blue)
+    ctx.fillStyle = '#050b14';
+    ctx.fillRect(0, 0, 800, 550);
 
-    // Draw border
-    ctx.strokeStyle = '#d500f9';
-    ctx.lineWidth = 10;
-    ctx.strokeRect(10, 10, 580, 380);
+    // Neon borders (aqua-blue gradient)
+    const borderGrad = ctx.createLinearGradient(0, 0, 800, 550);
+    borderGrad.addColorStop(0, '#00f2fe');
+    borderGrad.addColorStop(1, '#0984e3');
+    
+    ctx.strokeStyle = borderGrad;
+    ctx.lineWidth = 14;
+    ctx.strokeRect(15, 15, 770, 520);
 
-    // Draw double thin border
-    ctx.strokeStyle = '#00b0ff';
+    // Double thin inner border
+    ctx.strokeStyle = 'rgba(0, 242, 254, 0.2)';
     ctx.lineWidth = 2;
-    ctx.strokeRect(20, 20, 560, 360);
+    ctx.strokeRect(25, 25, 750, 500);
 
-    // Draw gold corners
-    ctx.fillStyle = '#ffea00';
-    ctx.fillRect(10, 10, 30, 30);
-    ctx.fillRect(560, 10, 30, 30);
-    ctx.fillRect(10, 360, 30, 30);
-    ctx.fillRect(560, 360, 30, 30);
+    // Neon glowing corners (little squares)
+    ctx.fillStyle = '#00f2fe';
+    ctx.fillRect(15, 15, 25, 25);
+    ctx.fillRect(760, 15, 25, 25);
+    ctx.fillRect(15, 510, 25, 25);
+    ctx.fillRect(760, 510, 25, 25);
 
-    // Header Text
+    // Header Title
     ctx.fillStyle = '#ffffff';
-    ctx.font = 'bold 24px Outfit, sans-serif';
+    ctx.font = 'bold 36px Outfit, sans-serif';
     ctx.textAlign = 'center';
-    ctx.fillText('CERTIFICATE OF MASTERY', 300, 75);
+    ctx.fillText('CERTIFICATE OF MASTERY', 400, 95);
 
-    ctx.fillStyle = '#9f98b5';
-    ctx.font = '14px Inter, sans-serif';
-    ctx.fillText('PROUDLY PRESENTED TO THE SCHOLAR OF coordination chemistry', 300, 115);
+    // Subtitle
+    ctx.fillStyle = '#8ca3ba';
+    ctx.font = '500 15px Inter, sans-serif';
+    ctx.fillText('PROUDLY PRESENTED TO THE PHYSICAL CHEMISTRY SCHOLAR', 400, 145);
 
-    // Dynamic user name placeholder (since it's a game certificate)
-    ctx.fillStyle = '#00b0ff';
-    ctx.font = 'bold 28px Outfit, sans-serif';
-    ctx.fillText('CoordiCraft Chemistry Master', 300, 175);
+    // Student Name (Elegant Script-like styling)
+    ctx.fillStyle = '#00f2fe';
+    ctx.font = 'italic bold 40px Courier New, Outfit, sans-serif';
+    ctx.fillText(name, 400, 220);
 
-    // Certificate Body
-    ctx.fillStyle = '#f3f0fc';
-    ctx.font = '14px Inter, sans-serif';
-    ctx.fillText(`For successfully completing the 25-Question Class XII NCERT Mastery Test`, 300, 225);
-    ctx.fillText(`with a score of ${score} / 25 (${Math.round((score/25)*100)}% Accuracy)`, 300, 250);
+    // Divider line below name
+    ctx.strokeStyle = 'rgba(0, 242, 254, 0.4)';
+    ctx.lineWidth = 1.5;
+    ctx.beginPath();
+    ctx.moveTo(250, 250);
+    ctx.lineTo(550, 250);
+    ctx.stroke();
 
-    // Seal or emblem in background center
-    ctx.fillStyle = 'rgba(213, 0, 249, 0.1)';
-    ctx.font = '100px Arial';
-    ctx.fillText('💠', 300, 250);
+    // Body text
+    ctx.fillStyle = '#f1f6fc';
+    ctx.font = '15px Inter, sans-serif';
+    ctx.fillText('For demonstrating outstanding conceptual and numerical proficiency in the', 400, 290);
+    ctx.fillText('NCERT Class XII Chemistry Chapter: Solutions,', 400, 315);
+    ctx.fillText(`securing a score of ${score} / 25 (${accuracy}% accuracy) on the Certification Exam.`, 400, 340);
 
-    // Footer lines
+    // Seal or emblem in background center (Large chemistry flask outline)
+    ctx.fillStyle = 'rgba(0, 242, 254, 0.05)';
+    ctx.font = '180px Arial';
+    ctx.fillText('🧪', 400, 340);
+
+    // Signatures
     ctx.strokeStyle = 'rgba(255, 255, 255, 0.2)';
     ctx.lineWidth = 1;
     ctx.beginPath();
-    ctx.moveTo(100, 320);
-    ctx.lineTo(230, 320);
-    ctx.moveTo(370, 320);
-    ctx.lineTo(500, 320);
+    ctx.moveTo(150, 440);
+    ctx.lineTo(310, 440);
+    ctx.moveTo(490, 440);
+    ctx.lineTo(650, 440);
     ctx.stroke();
 
-    ctx.fillStyle = '#9f98b5';
-    ctx.font = '10px Inter, sans-serif';
-    ctx.fillText('COORDI-CRAFT ACADEMY', 165, 335);
-    ctx.fillText('BOARD OF EXAMINERS', 435, 335);
+    ctx.fillStyle = '#8ca3ba';
+    ctx.font = '12px Inter, sans-serif';
+    ctx.fillText('SOLUCRAFT ACADEMY', 230, 460);
+    ctx.fillText('BOARD OF EXAMINERS', 570, 460);
 
+    // Signature scripts
     ctx.fillStyle = '#00e676';
-    ctx.font = 'italic 16px Courier New';
-    ctx.fillText('Verified', 165, 310);
-    ctx.fillText('Class XII NCERT', 435, 310);
+    ctx.font = 'italic 18px Courier New';
+    ctx.fillText('Verified', 230, 428);
+    ctx.fillText('Class XII NCERT', 570, 428);
 
-    // Render as image
+    // Convert Canvas to download image
     const dataURL = canvas.toDataURL('image/png');
     const img = document.getElementById('certificate-image');
     img.src = dataURL;
@@ -1252,28 +1600,14 @@ document.addEventListener('DOMContentLoaded', () => {
   // Download Certificate Button
   document.getElementById('download-cert-btn').addEventListener('click', () => {
     const canvas = document.getElementById('certificate-canvas');
-    const image = canvas.toDataURL("image/png").replace("image/png", "image/octet-stream");
+    const image = canvas.toDataURL("image/png");
     const link = document.createElement('a');
-    link.download = 'CoordiCraft_Master_Certificate.png';
+    link.download = `${progressState.studentName.replace(/\s+/g, '_')}_Solutions_Mastery_Certificate.png`;
     link.href = image;
     link.click();
   });
 
-  loadQuizQuestion();
-
-
-  // ==========================================
-  // UTILITY FUNCTIONS
-  // ==========================================
-  function shuffleArray(array) {
-    let currentIndex = array.length, randomIndex;
-    while (currentIndex !== 0) {
-      randomIndex = Math.floor(Math.random() * currentIndex);
-      currentIndex--;
-      [array[currentIndex], array[randomIndex]] = [
-        array[randomIndex], array[currentIndex]];
-    }
-    return array;
-  }
+  // Initial trigger for Concentration Lab particles loop on setup
+  initBeakerCanvas();
 
 });

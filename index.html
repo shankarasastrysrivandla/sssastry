@@ -3,21 +3,36 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>CoordiCraft - Class XII NCERT Coordination Compounds Hub</title>
-  <meta name="description" content="Master coordination chemistry through interactive simulations, IUPAC nomenclature builders, ligand sorting games, and a 25-question NCERT-aligned quiz.">
+  <title>SoluCraft - Class XII NCERT Solutions Interactive Hub</title>
+  <meta name="description" content="Master physical chemistry solutions chapter through virtual labs, Raoult's law curve simulations, osmosis cell dynamics, and a 25-question NCERT-aligned certificate quiz.">
   <link rel="stylesheet" href="style.css">
   <!-- Google Fonts for modern sleek UI look -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+  <!-- MathJax for rendering equations beautifully -->
+  <script>
+    window.MathJax = {
+      tex: {
+        inlineMath: [['\\(', '\\)']],
+        displayMath: [['\\[', '\\]']]
+      },
+      svg: {
+        fontCache: 'global'
+      }
+    };
+  </script>
+  <script type="text/javascript" id="MathJax-script" async
+    src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js">
+  </script>
 </head>
 <body>
   <div class="app-container">
     <!-- Sidebar Navigation -->
     <aside class="sidebar">
       <div class="logo-container">
-        <div class="logo-icon">💠</div>
-        <div class="logo-text">CoordiCraft</div>
+        <div class="logo-icon">🧪</div>
+        <div class="logo-text">SoluCraft</div>
       </div>
       
       <nav>
@@ -29,21 +44,21 @@
             </div>
           </li>
           <li class="nav-item">
-            <div class="nav-link" data-tab="nomenclature" id="nav-nomenclature">
-              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9M3 20v-8a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v8M3 10V6a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v4M13 14V6a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v8"/></svg>
-              <span>Nomenclature Builder</span>
+            <div class="nav-link" data-tab="concentration-lab" id="nav-concentration-lab">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+              <span>Concentration Mixer</span>
             </div>
           </li>
           <li class="nav-item">
-            <div class="nav-link" data-tab="cft-lab" id="nav-cft-lab">
+            <div class="nav-link" data-tab="raoults-lab" id="nav-raoults-lab">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 20V10M12 20V4M6 20v-6"/></svg>
+              <span>Raoult's Law Lab</span>
+            </div>
+          </li>
+          <li class="nav-item">
+            <div class="nav-link" data-tab="colligative-lab" id="nav-colligative-lab">
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M8 12h8M12 8v8"/></svg>
-              <span>Crystal Field Lab</span>
-            </div>
-          </li>
-          <li class="nav-item">
-            <div class="nav-link" data-tab="ligand-sorter" id="nav-ligand-sorter">
-              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v18M3 12h18M6.5 6.5l11 11M6.5 17.5l11-11"/></svg>
-              <span>Ligand Sorter</span>
+              <span>Colligative Lab</span>
             </div>
           </li>
           <li class="nav-item">
@@ -61,7 +76,7 @@
         <div class="progress-bar-container">
           <div class="progress-bar-fill" id="sidebar-progress-bar"></div>
         </div>
-        <div>CoordiCraft v1.0</div>
+        <div>SoluCraft v1.0</div>
       </div>
     </aside>
 
@@ -74,528 +89,523 @@
       <section id="dashboard" class="tab-panel active">
         <div class="glass-card welcome-banner">
           <div class="banner-content">
-            <h1 class="welcome-title">Coordination <span>Complexes</span></h1>
-            <p class="panel-subtitle">An interactive learning journey covering NCERT Class XII Chemistry. Dive into Coordination compounds, isomerism, Valence Bond Theory, and Crystal Field split energies through simulations and games.</p>
+            <h1 class="welcome-title">Liquid <span>Solutions</span></h1>
+            <p class="panel-subtitle">An interactive learning journey covering NCERT Class XII Chemistry. Master concentration expressions, vapor pressure deviations, osmotic cell kinetics, and colligative properties through visual simulations.</p>
           </div>
         </div>
 
         <!-- Concept Navigation Tabs -->
         <div class="concept-nav">
-          <button class="concept-btn active" data-concept="werner">Werner's & Double Salts</button>
-          <button class="concept-btn" data-concept="nomenclature-info">Nomenclature Rules</button>
-          <button class="concept-btn" data-concept="isomerism">Isomerism</button>
-          <button class="concept-btn" data-concept="vbt">VBT (Valence Bond Theory)</button>
-          <button class="concept-btn" data-concept="cft">CFT (Crystal Field Theory)</button>
-          <button class="concept-btn" data-concept="carbonyls">Metal Carbonyls & Apps</button>
+          <button class="concept-btn active" data-concept="sol-types">Types & Concentrations</button>
+          <button class="concept-btn" data-concept="solubility">Solubility & Henry's Law</button>
+          <button class="concept-btn" data-concept="raoults-law">Raoult's Law</button>
+          <button class="concept-btn" data-concept="deviations">Ideal vs Non-Ideal</button>
+          <button class="concept-btn" data-concept="colligative">Colligative Properties</button>
+          <button class="concept-btn" data-concept="vanthoff">van 't Hoff Factor</button>
         </div>
 
         <!-- Concept Contents -->
         <div class="glass-card concept-card-container">
           
-          <!-- Werner Content -->
-          <div class="concept-content active" id="concept-werner">
-            <h2>Werner's Theory & Double Salts</h2>
+          <!-- Types of Solutions -->
+          <div class="concept-content active" id="concept-sol-types">
+            <h2>Types of Solutions & Concentration Expressing</h2>
             <div class="concept-grid">
               <div class="info-block">
-                <h3>Double Salts vs Coordination Compounds</h3>
-                <p><strong>Double Salts</strong> (e.g., Mohr's Salt [FeSO<sub>4</sub>·(NH<sub>4</sub>)<sub>2</sub>SO<sub>4</sub>·6H<sub>2</sub>O], Carnallite) dissociate completely into simple ions when dissolved in water. They lose their identity in solution.</p>
-                <p><strong>Coordination Compounds</strong> (e.g., K<sub>4</sub>[Fe(CN)<sub>6</sub>]) do not dissociate completely. The complex ion [Fe(CN)<sub>6</sub>]<sup>4-</sup> remains intact and does not give tests for individual Fe<sup>2+</sup> or CN<sup>-</sup> ions.</p>
-              </div>
-              <div class="info-block">
-                <h3>Werner's Postulates</h3>
-                <ul>
-                  <li><strong>Primary Valency:</strong> Ionizable, corresponds to the oxidation state of the metal. Satisfied by negative ions. Represented by dotted lines.</li>
-                  <li><strong>Secondary Valency:</strong> Non-ionizable, corresponds to the coordination number (fixed for a metal). Satisfied by neutral molecules or negative ions. Represented by thick solid lines.</li>
-                </ul>
-                <div class="example-box">
-                  <strong>Example:</strong> CoCl<sub>3</sub>·6NH<sub>3</sub> forms [Co(NH<sub>3</sub>)<sub>6</sub>]Cl<sub>3</sub>. When treated with AgNO<sub>3</sub>, 3 moles of AgCl precipitate, meaning 3 Cl<sup>-</sup> ions are outside the coordination sphere (primary valencies).
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <!-- Nomenclature Info Content -->
-          <div class="concept-content" id="concept-nomenclature-info">
-            <h2>Nomenclature Rules (IUPAC)</h2>
-            <div class="concept-grid">
-              <div class="info-block">
-                <h3>Key Rules for Naming</h3>
-                <ol>
-                  <li><strong>Order of Naming:</strong> Cation is named first, followed by the anion, regardless of whether they are complex or simple.</li>
-                  <li><strong>Naming Coordination Sphere:</strong> Ligands are named first in alphabetical order, followed by the central metal atom.</li>
-                  <li><strong>Ligand Prefixes:</strong> Use <em>di-, tri-, tetra-, penta-, hexa-</em> for simple ligands. Use <em>bis-, tris-, tetrakis-</em> for complex ligands containing prefixes (e.g., ethylenediamine).</li>
-                  <li><strong>Ligand Names:</strong> Anionic ligands end in <strong>-o</strong> (e.g., chloride &rarr; chlorido, cyanide &rarr; cyanido). Neutral ligands use special names (e.g., H<sub>2</sub>O &rarr; aqua, NH<sub>3</sub> &rarr; ammine, CO &rarr; carbonyl).</li>
-                </ol>
-              </div>
-              <div class="info-block">
-                <h3>Naming the Central Metal</h3>
-                <ul>
-                  <li>If the coordination entity is a <strong>cation</strong> or <strong>neutral</strong>, the metal is named as is (e.g., Cobalt, Platinum) followed by its oxidation state in Roman numerals in parentheses.</li>
-                  <li>If the coordination entity is an <strong>anion</strong>, the metal name ends in <strong>-ate</strong> (e.g., Cobalt &rarr; cobaltate, Iron &rarr; ferrate, Copper &rarr; cuprate, Silver &rarr; argentate).</li>
-                </ul>
-                <div class="example-box">
-                  <strong>Examples:</strong><br>
-                  • [Co(NH<sub>3</sub>)<sub>6</sub>]Cl<sub>3</sub> &rarr; Hexaamminecobalt(III) chloride<br>
-                  • K<sub>4</sub>[Fe(CN)<sub>6</sub>] &rarr; Potassium hexacyanidoferrate(II)
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <!-- Isomerism Content -->
-          <div class="concept-content" id="concept-isomerism">
-            <h2>Isomerism in Coordination Compounds</h2>
-            <div class="concept-grid">
-              <div class="info-block">
-                <h3>Structural Isomerism</h3>
-                <ul>
-                  <li><strong>Linkage Isomerism:</strong> Occurs in complexes with ambidentate ligands (e.g., [Co(NH<sub>3</sub>)<sub>5</sub>(NO<sub>2</sub>)]Cl<sub>2</sub> [nitro, red] vs [Co(NH<sub>3</sub>)<sub>5</sub>(ONO)]Cl<sub>2</sub> [nitrito, yellow]).</li>
-                  <li><strong>Coordination Isomerism:</strong> Interchange of ligands between cationic and anionic entities (e.g., [Co(NH<sub>3</sub>)<sub>6</sub>][Cr(CN)<sub>6</sub>] and [Cr(NH<sub>3</sub>)<sub>6</sub>][Co(CN)<sub>6</sub>]).</li>
-                  <li><strong>Ionisation Isomerism:</strong> Gives different ions in solution (e.g., [Co(NH<sub>3</sub>)<sub>5</sub>SO<sub>4</sub>]Br [red-violet, gives BaSO<sub>4</sub> negative, AgBr positive] vs [Co(NH<sub>3</sub>)<sub>5</sub>Br]SO<sub>4</sub> [red, gives BaSO<sub>4</sub> precipitate]).</li>
-                  <li><strong>Solvate / Hydrate Isomerism:</strong> Differs by whether water is inside or outside the coordination sphere (e.g., [Cr(H<sub>2</sub>O)<sub>6</sub>]Cl<sub>3</sub> [violet] vs [Cr(H<sub>2</sub>O)<sub>5</sub>Cl]Cl<sub>2</sub>·H<sub>2</sub>O [grey-green]).</li>
-                </ul>
-              </div>
-              <div class="info-block">
-                <h3>Stereoisomerism</h3>
-                <p><strong>Geometrical Isomerism:</strong> Common in coordination numbers 4 (square planar only, e.g. cis/trans [Pt(NH<sub>3</sub>)<sub>2</sub>Cl<sub>2</sub>]) and 6 (octahedral, e.g. cis/trans [Co(NH<sub>3</sub>)<sub>4</sub>Cl<sub>2</sub>]<sup>+</sup>, and fac/mer [Co(NH<sub>3</sub>)<sub>3</sub>(NO<sub>2</sub>)<sub>3</sub>]). Tetrahedral complexes do not show geometrical isomerism due to relative positions being adjacent.</p>
-                <p><strong>Optical Isomerism:</strong> Non-superimposable mirror images (chiral). Common in octahedral complexes with bidentate ligands (e.g., [Co(en)<sub>3</sub>]<sup>3+</sup> or cis-[Co(en)<sub>2</sub>Cl<sub>2</sub>]<sup>+</sup>). The trans isomer is symmetrical (has plane of symmetry) and optically inactive.</p>
-              </div>
-            </div>
-          </div>
-
-          <!-- VBT Content -->
-          <div class="concept-content" id="concept-vbt">
-            <h2>Valence Bond Theory (VBT)</h2>
-            <div class="concept-grid">
-              <div class="info-block">
-                <h3>Core Assumptions</h3>
-                <p>VBT explains bonding in terms of hybridization of metal orbitals. The metal provides empty orbitals to accept lone pairs from ligands.</p>
+                <h3>Classification of Solutions</h3>
+                <p>A solution is a homogeneous mixture of two or more substances. Subdivided based on physical states of solute and solvent:</p>
                 <table>
                   <thead>
                     <tr>
-                      <th>C.N.</th>
-                      <th>Geometry</th>
-                      <th>Hybridization</th>
-                      <th>Examples</th>
+                      <th>Solute</th>
+                      <th>Solvent</th>
+                      <th>Common NCERT Example</th>
                     </tr>
                   </thead>
                   <tbody>
                     <tr>
-                      <td>4</td>
-                      <td>Tetrahedral</td>
-                      <td>sp<sub>3</sub></td>
-                      <td>[Ni(CO)<sub>4</sub>], [Ni(Cl)<sub>4</sub>]<sup>2-</sup></td>
+                      <td>Gas</td>
+                      <td>Gas</td>
+                      <td>Air (Oxygen + Nitrogen mixture)</td>
                     </tr>
                     <tr>
-                      <td>4</td>
-                      <td>Square Planar</td>
-                      <td>dsp<sub>2</sub></td>
-                      <td>[Ni(CN)<sub>4</sub>]<sup>2-</sup>, [Pt(Cl)<sub>4</sub>]<sup>2-</sup></td>
+                      <td>Liquid</td>
+                      <td>Liquid</td>
+                      <td>Ethanol dissolved in Water</td>
                     </tr>
                     <tr>
-                      <td>6</td>
-                      <td>Octahedral (Inner)</td>
-                      <td>d<sup>2</sup>sp<sub>3</sub></td>
-                      <td>[Fe(CN)<sub>6</sub>]<sup>4-</sup>, [Co(NH<sub>3</sub>)<sub>6</sub>]<sup>3+</sup></td>
+                      <td>Solid</td>
+                      <td>Liquid</td>
+                      <td>Glucose or NaCl dissolved in Water</td>
                     </tr>
                     <tr>
-                      <td>6</td>
-                      <td>Octahedral (Outer)</td>
-                      <td>sp<sub>3</sub>d<sup>2</sup></td>
-                      <td>[CoF<sub>6</sub>]<sup>3-</sup>, [Fe(H<sub>2</sub>O)<sub>6</sub>]<sup>2+</sup></td>
+                      <td>Gas</td>
+                      <td>Solid</td>
+                      <td>Solution of Hydrogen in Palladium (\(\text{H}_2/\text{Pd}\))</td>
+                    </tr>
+                    <tr>
+                      <td>Liquid</td>
+                      <td>Solid</td>
+                      <td>Amalgam of Mercury with Sodium (\(\text{Hg}-\text{Na}\))</td>
+                    </tr>
+                    <tr>
+                      <td>Solid</td>
+                      <td>Solid</td>
+                      <td>Copper dissolved in Gold (Alloys)</td>
                     </tr>
                   </tbody>
                 </table>
               </div>
               <div class="info-block">
-                <h3>Inner vs. Outer Orbital Complexes</h3>
+                <h3>Expressing Concentration</h3>
+                <p>Quantitative measurement of solute dissolved in solvent:</p>
                 <ul>
-                  <li><strong>Inner Orbital Complexes (Low Spin):</strong> Formed when strong field ligands force d-electrons to pair up, leaving inner (n-1)d orbitals free for hybridization (e.g., d<sup>2</sup>sp<sub>3</sub>). Usually diamagnetic or low spin.</li>
-                  <li><strong>Outer Orbital Complexes (High Spin):</strong> Formed when weak field ligands cannot force pairing. Outer nd orbitals are used for hybridization (e.g., sp<sub>3</sub>d<sup>2</sup>). Usually paramagnetic or high spin.</li>
+                  <li><strong>Molarity (\(M\)):</strong> Moles of solute per litre of solution. <em>Temperature dependent.</em>
+                    <div class="formula-box">\(M = \frac{\text{moles of solute}}{\text{Volume of solution in L}}\)</div>
+                  </li>
+                  <li><strong>Molality (\(m\)):</strong> Moles of solute per kg of solvent. <em>Temperature independent.</em>
+                    <div class="formula-box">\(m = \frac{\text{moles of solute}}{\text{Mass of solvent in kg}}\)</div>
+                  </li>
+                  <li><strong>Mole Fraction (\(\chi_A\)):</strong> Ratio of moles of component A to total moles.
+                    <div class="formula-box">\(\chi_A = \frac{n_A}{n_A + n_B}\quad (\chi_A + \chi_B = 1)\)</div>
+                  </li>
+                  <li><strong>Parts per Million (ppm):</strong> Used for trace quantities.
+                    <div class="formula-box">\(\text{ppm} = \frac{\text{Mass of solute}}{\text{Total mass of solution}} \times 10^6\)</div>
+                  </li>
                 </ul>
-                <div class="example-box">
-                  <strong>Magnetic Moment (&mu;):</strong> Calculated using the spin-only formula: &mu; = &radic;[n(n+2)] Bohr Magnetons (BM), where n = number of unpaired electrons.
-                </div>
               </div>
             </div>
           </div>
 
-          <!-- CFT Content -->
-          <div class="concept-content" id="concept-cft">
-            <h2>Crystal Field Theory (CFT)</h2>
+          <!-- Solubility & Henry's Law -->
+          <div class="concept-content" id="concept-solubility">
+            <h2>Solubility of Gases & Solids</h2>
             <div class="concept-grid">
               <div class="info-block">
-                <h3>The Electrostatic Model</h3>
-                <p>CFT treats the metal-ligand bond as purely ionic, resulting from electrostatic attractions. The approach of negative ligand point charges splits the degenerate d-orbitals of the metal ion into sets with different energies.</p>
-                <h4>Octahedral Field Splitting (&Delta;<sub>o</sub>)</h4>
-                <p>Orbitals pointing along the axes (d<sub>x<sup>2</sup>-y<sup>2</sup></sub>, d<sub>z<sup>2</sup></sub>) experience more repulsion and rise in energy to form the <strong>e<sub>g</sub></strong> set. Orbitals pointing between the axes (d<sub>xy</sub>, d<sub>yz</sub>, d<sub>xz</sub>) experience less repulsion and fall in energy to form the <strong>t<sub>2g</sub></strong> set. The gap is &Delta;<sub>o</sub>.</p>
-                <h4>Tetrahedral Field Splitting (&Delta;<sub>t</sub>)</h4>
-                <p>The splitting is inverted: <strong>t<sub>2</sub></strong> (higher) and <strong>e</sub></strong> (lower). The splitting energy is smaller: &Delta;<sub>t</sub> = (4/9) &Delta;<sub>o</sub>. Thus, tetrahedral complexes are almost always high spin.</p>
+                <h3>Factors Influencing Solubility</h3>
+                <p><strong>Solids in Liquids:</strong> Follows <em>"like dissolves like"</em>. Polar solutes (NaCl) dissolve in polar solvents (water). 
+                  Dissolution is endothermic (\(\Delta H > 0\)), solubility increases with temperature. If exothermic (\(\Delta H < 0\)), solubility decreases. Pressure has no significant effect due to solids/liquids being highly incompressible.</p>
+                <p><strong>Gases in Liquids:</strong> Exothermic dissolution (\(\Delta H < 0\)). Solubility **decreases** as temperature increases. Solubility increases significantly with pressure.</p>
               </div>
               <div class="info-block">
-                <h3>Spectrochemical Series & Color</h3>
-                <p>Ligands are arranged in order of increasing field strength:</p>
-                <div class="series-box">
-                  I<sup>-</sup> &lt; Br<sup>-</sup> &lt; S<sup>2-</sup> &lt; SCN<sup>-</sup> &lt; Cl<sup>-</sup> &lt; F<sup>-</sup> &lt; OH<sup>-</sup> &lt; C<sub>2</sub>O<sub>4</sub><sup>2-</sup> &lt; H<sub>2</sub>O &lt; NCS<sup>-</sup> &lt; EDTA<sup>4-</sup> &lt; NH<sub>3</sub> &lt; en &lt; CN<sup>-</sup> &lt; CO
-                </div>
+                <h3>Henry's Law</h3>
+                <p>At a constant temperature, the solubility of a gas in a liquid is directly proportional to the partial pressure of the gas present above the surface of the liquid or solution.</p>
+                <div class="formula-box">\(p = K_H \cdot \chi\)</div>
+                <p>Where \(p\) is partial pressure, \(\chi\) is mole fraction of gas in solution, and \(K_H\) is the Henry's Law constant.</p>
                 <ul>
-                  <li><strong>Strong Field (e.g., CN<sup>-</sup>, CO):</strong> &Delta;<sub>o</sub> &gt; P (pairing energy). Electrons pair in t<sub>2g</sub> before entering e<sub>g</sub> (low spin).</li>
-                  <li><strong>Weak Field (e.g., F<sup>-</sup>, Cl<sup>-</sup>):</strong> &Delta;<sub>o</sub> &lt; P. Electrons fill orbitals singly before pairing (high spin).</li>
+                  <li>Higher \(K_H\) at a given pressure means **lower solubility** of gas.</li>
+                  <li>\(K_H\) increases with temperature, which is why aquatic species are more comfortable in cold water than warm water.</li>
+                  <li><strong>Applications:</strong> Carbonated drinks (sealed under high pressure), Scuba diving (avoiding Bends by diluting air with Helium), Anoxia at high altitudes.</li>
                 </ul>
-                <p><strong>Color:</strong> Light absorption promotes an electron from t<sub>2g</sub> to e<sub>g</sub> (d-d transition). The observed color is complementary to the absorbed wavelength.</p>
               </div>
             </div>
           </div>
 
-          <!-- Carbonyls Content -->
-          <div class="concept-content" id="concept-carbonyls">
-            <h2>Metal Carbonyls & Applications</h2>
+          <!-- Raoult's Law -->
+          <div class="concept-content" id="concept-raoults-law">
+            <h2>Vapor Pressure & Raoult's Law</h2>
             <div class="concept-grid">
               <div class="info-block">
-                <h3>Bonding in Metal Carbonyls</h3>
-                <p>Metal carbonyls (e.g., [Ni(CO)<sub>4</sub>], [Fe(CO)<sub>5</sub>], [Cr(CO)<sub>6</sub>]) feature <strong>synergic bonding</strong>:</p>
+                <h3>Vapor Pressure of Liquid-Liquid Solutions</h3>
+                <p>In a volatile binary solution of components A and B, both molecules evaporate, reaching equilibrium. According to <strong>Raoult's Law</strong>, the partial vapor pressure of each volatile component is directly proportional to its mole fraction in solution.</p>
+                <div class="formula-box">\(p_A = p_A^0 \cdot \chi_A \quad \text{and} \quad p_B = p_B^0 \cdot \chi_B\)</div>
+                <p>Total pressure \(P_{\text{total}}\) over the solution is:</p>
+                <div class="formula-box">\(P_{\text{total}} = p_A + p_B = p_A^0 \chi_A + p_B^0 (1 - \chi_A)\)</div>
+                <p>where \(p_A^0\) and \(p_B^0\) are the vapor pressures of the pure components A and B.</p>
+              </div>
+              <div class="info-block">
+                <h3>Vapor Pressure of Solid-in-Liquid Solutions</h3>
+                <p>When a non-volatile solute (e.g., Glucose, NaCl) is added to a solvent, solute particles occupy surface sites. This reduces the number of solvent molecules escaping into vapor phase.</p>
+                <ul>
+                  <li>Vapor pressure of a solution containing non-volatile solute is **always lower** than pure solvent.</li>
+                  <li>The lowering depends only on the **concentration** of solute particles, not their nature.</li>
+                  <li>Mathematically: \(P_{\text{solution}} = p_{\text{solvent}}^0 \cdot \chi_{\text{solvent}}\).</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+
+          <!-- Ideal vs Non-Ideal Solutions -->
+          <div class="concept-content" id="concept-deviations">
+            <h2>Ideal and Non-Ideal Solutions & Azeotropes</h2>
+            <div class="concept-grid">
+              <div class="info-block">
+                <h3>Ideal Solutions</h3>
+                <p>Obey Raoult's law over the entire range of concentration. Formed when adhesive molecular forces (A-B) are equal to cohesive forces (A-A and B-B).</p>
+                <ul>
+                  <li>\(\Delta H_{\text{mix}} = 0\) (No heat absorbed or released)</li>
+                  <li>\(\Delta V_{\text{mix}} = 0\) (No volume expansion or contraction)</li>
+                  <li><strong>Examples:</strong> n-hexane + n-heptane, Bromoethane + Chloroethane, Benzene + Toluene.</li>
+                </ul>
+              </div>
+              <div class="info-block">
+                <h3>Non-Ideal Solutions</h3>
+                <p>Do not obey Raoult's law. Divided into two classes:</p>
                 <ol>
-                  <li><strong>&sigma; Bond:</strong> Ligand CO donates its lone pair of electrons from carbon to an empty d-orbital of the metal.</li>
-                  <li><strong>&pi; Back-donation:</strong> Filled d-orbital of the metal back-donates electrons into the empty anti-bonding &pi;* molecular orbital of CO.</li>
+                  <li><strong>Positive Deviation:</strong> A-B interactions are weaker than A-A/B-B interactions. Escaping tendency increases, so \(P_{\text{total}} > P_{\text{ideal}}\). \(\Delta H_{\text{mix}} > 0, \Delta V_{\text{mix}} > 0\). 
+                    <br><em>Example:</em> Ethanol + Acetone, Carbon disulfide + Acetone.</li>
+                  <li><strong>Negative Deviation:</strong> A-B interactions are stronger than A-A/B-B (e.g. hydrogen bonding). Escaping tendency decreases, so \(P_{\text{total}} < P_{\text{ideal}}\). \(\Delta H_{\text{mix}} < 0, \Delta V_{\text{mix}} < 0\).
+                    <br><em>Example:</em> Chloroform + Acetone, Nitric acid + Water.</li>
                 </ol>
-                <p>This feedback mechanism strengthens both the M-C bond and weakens the C-O bond, providing high stability to carbonyls.</p>
+                <p><strong>Azeotropes:</strong> Binary mixtures having same composition in liquid & vapor phase, boiling at a constant temp. Positive deviation forms <em>minimum boiling azeotrope</em>; negative deviation forms <em>maximum boiling azeotrope</em>.</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Colligative Properties -->
+          <div class="concept-content" id="concept-colligative">
+            <h2>Colligative Properties & Molar Mass</h2>
+            <div class="concept-grid">
+              <div class="info-block">
+                <h3>The Four Properties</h3>
+                <p>Properties of solutions that depend solely on the number of solute particles relative to solvent molecules, independent of their chemical identity:</p>
+                <ul>
+                  <li><strong>Relative Lowering of Vapor Pressure:</strong>
+                    <div class="formula-box">\(\frac{p_1^0 - p_1}{p_1^0} = \chi_2 = \frac{n_2}{n_1 + n_2}\)</div>
+                  </li>
+                  <li><strong>Elevation of Boiling Point (\(\Delta T_b\)):</strong> Solute addition decreases vapor pressure, meaning higher temperature is needed to make vapor pressure equal atmospheric pressure.
+                    <div class="formula-box">\(\Delta T_b = T_b - T_b^0 = K_b \cdot m\)</div>
+                    \(K_b\) is Ebullioscopic constant (Molal boiling point elevation constant).
+                  </li>
+                  <li><strong>Depression of Freezing Point (\(\Delta T_f\)):</strong> At freezing point, solid and liquid phases have same vapor pressure. Vapor pressure lowering pushes freezing point lower.
+                    <div class="formula-box">\(\Delta T_f = T_f^0 - T_f = K_f \cdot m\)</div>
+                    \(K_f\) is Cryoscopic constant (Molal freezing point depression constant).
+                  </li>
+                </ul>
               </div>
               <div class="info-block">
-                <h3>Applications of Coordination Compounds</h3>
+                <h3>Osmotic Pressure (\(\Pi\))</h3>
+                <p>Osmosis is the spontaneous flow of solvent molecules through a semi-permeable membrane (SPM) from pure solvent to solution. <strong>Osmotic pressure (\(\Pi\))</strong> is the excess pressure applied on solution side to stop osmosis.</p>
+                <div class="formula-box">\(\Pi = C \cdot R \cdot T\)</div>
+                <p>Where \(C\) is molarity, \(R\) is gas constant, and \(T\) is temperature in Kelvin.</p>
                 <ul>
-                  <li><strong>In Medicine:</strong> <em>Cisplatin</em> (cis-[Pt(NH<sub>3</sub>)<sub>2</sub>Cl<sub>2</sub>]) is used in cancer chemotherapy. <em>EDTA</em> is used in treatment of lead poisoning.</li>
-                  <li><strong>In Biology:</strong> Chlorophyll contains Mg<sup>2+</sup>, Hemoglobin contains Fe<sup>2+</sup>, and Vitamin B12 contains Co<sup>3+</sup>.</li>
-                  <li><strong>In Metallurgy:</strong> Extraction of silver and gold involves forming soluble cyano-complexes (e.g., [Au(CN)<sub>2</sub>]<sup>-</sup>).</li>
-                  <li><strong>In Qualitative Analysis:</strong> Detection of Ni<sup>2+</sup> using dimethylglyoxime (DMG) forming a rosy red complex.</li>
+                  <li><strong>Reverse Osmosis (RO):</strong> If pressure applied exceeds osmotic pressure (\(P > \Pi\)), solvent flows from solution to pure solvent. Used in desalination.</li>
+                  <li><strong>RBC behaviors:</strong> Hypertonic (solution concentration > 0.9% NaCl, cells shrink), Hypotonic (concentration < 0.9%, cells swell/burst), Isotonic (equal concentration).</li>
                 </ul>
               </div>
             </div>
           </div>
 
+          <!-- van 't Hoff Factor -->
+          <div class="concept-content" id="concept-vanthoff">
+            <h2>Abnormal Molar Masses & van 't Hoff Factor (i)</h2>
+            <div class="concept-grid">
+              <div class="info-block">
+                <h3>Abnormal Molar Mass</h3>
+                <p>Colligative properties are inversely proportional to solute molar mass. When solutes undergo dissociation (e.g. ionic salts) or association (e.g. organic acids in non-polar solvents), the number of particles in solution changes, leading to anomalous calculated molar masses.</p>
+                <p>To account for this, J.H. van 't Hoff introduced the factor \(i\):</p>
+                <div class="formula-box">\(i = \frac{\text{Observed colligative property}}{\text{Calculated colligative property}} = \frac{\text{Normal molar mass}}{\text{Abnormal molar mass}}\)</div>
+                <div class="formula-box">\(i = \frac{\text{Total moles of particles after association/dissociation}}{\text{Total moles of particles before association/dissociation}}\)</div>
+              </div>
+              <div class="info-block">
+                <h3>Calculations & Modified Equations</h3>
+                <ul>
+                  <li><strong>For Dissociation (e.g., \(\text{NaCl} \rightarrow \text{Na}^+ + \text{Cl}^-\)):</strong> Particles increase, so \(i > 1\).
+                    <div class="formula-box">\(i = 1 + (n - 1)\alpha\)</div>
+                    where \(\alpha\) is degree of dissociation, \(n\) is number of ions formed. For strong electrolytes with complete dissociation, \(i = n\) (e.g., \(i=2\) for \(\text{NaCl}\), \(i=3\) for \(\text{K}_2\text{SO}_4\)).
+                  </li>
+                  <li><strong>For Association (e.g., dimers of acetic acid in benzene):</strong> Particles decrease, so \(i < 1\).
+                    <div class="formula-box">\(i = 1 - (1 - \frac{1}{n})\beta\)</div>
+                    where \(\beta\) is degree of association. For dimerizing acids with complete association, \(i = 0.5\).
+                  </li>
+                </ul>
+                <p><strong>Modified Colligative Equations:</strong></p>
+                <p class="small-text">
+                  \(\frac{\Delta p}{p^0} = i \chi_2 \quad | \quad \Delta T_b = i K_b m \quad | \quad \Delta T_f = i K_f m \quad | \quad \Pi = i C R T\)
+                </p>
+              </div>
+            </div>
+          </div>
+
         </div>
       </section>
 
       <!-- ========================================== -->
-      <!-- 2. NOMENCLATURE BUILDER PANEL              -->
+      <!-- 2. CONCENTRATION MIXER PANEL               -->
       <!-- ========================================== -->
-      <section id="nomenclature" class="tab-panel">
+      <section id="concentration-lab" class="tab-panel">
         <div class="glass-card game-header">
-          <h2>IUPAC Nomenclature Builder</h2>
-          <p>Assemble the IUPAC name for the given coordination complex by selecting the name parts in the correct order. Keep an eye on the complex charge and metal ending!</p>
-          <div class="game-stats">
-            <div>Score: <span id="nom-score" class="stat-highlight">0</span></div>
-            <div>Streak: <span id="nom-streak" class="stat-highlight">0</span></div>
-            <div>Lives: <span id="nom-lives">❤️❤️❤️</span></div>
-          </div>
-        </div>
-
-        <div class="game-area">
-          <div class="glass-card formula-display-card">
-            <span class="formula-label">Coordination Complex:</span>
-            <div id="nom-formula" class="formula-text">[Co(NH<sub>3</sub>)<sub>6</sub>]Cl<sub>3</sub></div>
-          </div>
-
-          <div class="glass-card construction-card">
-            <h3>Your Assembled Name:</h3>
-            <div id="assembled-name-container" class="assembled-name-placeholder">
-              Click elements below to assemble the name...
-            </div>
-            <div class="action-buttons">
-              <button id="nom-clear-btn" class="secondary-btn">Clear</button>
-              <button id="nom-submit-btn" class="primary-btn">Submit Answer</button>
-              <button id="nom-skip-btn" class="secondary-btn">Skip</button>
-            </div>
-          </div>
-
-          <div class="glass-card options-card">
-            <h3>Available Nomenclature Cards:</h3>
-            <div id="nom-cards-container" class="cards-grid">
-              <!-- Name parts loaded dynamically -->
-            </div>
-          </div>
-        </div>
-
-        <!-- Result overlay modal for explanation -->
-        <div id="nom-feedback-modal" class="modal hidden">
-          <div class="modal-content glass-card">
-            <h3 id="nom-modal-title">Correct!</h3>
-            <div id="nom-modal-body">
-              Explanation goes here.
-            </div>
-            <button id="nom-modal-close" class="primary-btn">Next Complex</button>
-          </div>
-        </div>
-      </section>
-
-      <!-- ========================================== -->
-      <!-- 3. CRYSTAL FIELD LAB PANEL                 -->
-      <!-- ========================================== -->
-      <section id="cft-lab" class="tab-panel">
-        <div class="glass-card game-header">
-          <h2>Crystal Field Lab & Simulator</h2>
-          <p>Explore Crystal Field Theory (CFT) in real-time. Choose a metal ion, coordination geometry, and ligand. Watch the d-orbitals split, electrons fill based on ligand field strength, and see the resulting magnetic properties and predicted color!</p>
+          <h2>Concentration Mixer Lab</h2>
+          <p>Prepare virtual aqueous solutions and calculate chemical concentration properties in real-time. Adjust solute mass, volume, and substance to see how particle density and molar metrics respond.</p>
         </div>
 
         <div class="lab-layout">
-          <!-- Controls Column -->
+          <!-- Controls Panel -->
           <div class="glass-card lab-controls">
-            <h3>Lab Settings</h3>
+            <h3>Solution Setup</h3>
             
             <div class="control-group">
-              <label for="lab-metal">Central Metal Ion:</label>
-              <select id="lab-metal">
-                <option value="Ti3">Ti³⁺ (d¹)</option>
-                <option value="V3">V³⁺ (d²)</option>
-                <option value="Cr3">Cr³⁺ (d³)</option>
-                <option value="Mn3">Mn³⁺ (d⁴)</option>
-                <option value="Fe3">Fe³⁺ (d⁵)</option>
-                <option value="Fe2" selected>Fe²⁺ (d⁶)</option>
-                <option value="Co3">Co³⁺ (d⁶)</option>
-                <option value="Co2">Co²⁺ (d⁷)</option>
-                <option value="Ni2">Ni²⁺ (d⁸)</option>
-                <option value="Cu2">Cu²⁺ (d⁹)</option>
-                <option value="Zn2">Zn²⁺ (d¹⁰)</option>
+              <label for="mix-solute">Solute Substance:</label>
+              <select id="mix-solute">
+                <option value="NaCl" selected>Sodium Chloride (NaCl) [M = 58.5 g/mol]</option>
+                <option value="Glucose">Glucose (C₆H₁₂O₆) [M = 180.0 g/mol]</option>
+                <option value="Urea">Urea (NH₂CONH₂) [M = 60.0 g/mol]</option>
+                <option value="Ethanol">Ethanol (C₂H₅OH) [M = 46.0 g/mol]</option>
+                <option value="CaCl2">Calcium Chloride (CaCl₂) [M = 111.0 g/mol]</option>
               </select>
             </div>
 
             <div class="control-group">
-              <label>Geometry:</label>
-              <div class="radio-toggle">
-                <input type="radio" id="geom-oct" name="lab-geometry" value="octahedral" checked>
-                <label for="geom-oct">Octahedral (C.N. = 6)</label>
-                
-                <input type="radio" id="geom-tet" name="lab-geometry" value="tetrahedral">
-                <label for="geom-tet">Tetrahedral (C.N. = 4)</label>
+              <div class="slider-label-row">
+                <label for="mix-mass">Solute Mass (g):</label>
+                <span id="mix-mass-val" class="stat-highlight">10.0g</span>
               </div>
+              <input type="range" id="mix-mass" min="1" max="150" step="0.5" value="10">
             </div>
 
             <div class="control-group">
-              <label for="lab-ligand">Ligand (Spectrochemical Series):</label>
-              <select id="lab-ligand">
-                <option value="I">I⁻ (Very Weak Field)</option>
-                <option value="Cl">Cl⁻ (Weak Field)</option>
-                <option value="F">F⁻ (Weak Field)</option>
-                <option value="H2O">H₂O (Weak Field - Borderline)</option>
-                <option value="NH3" selected>NH₃ (Strong Field)</option>
-                <option value="en">ethylenediamine (en) (Strong Field)</option>
-                <option value="CN">CN⁻ (Very Strong Field)</option>
-                <option value="CO">CO (Synergic - Extremely Strong)</option>
-              </select>
+              <div class="slider-label-row">
+                <label for="mix-volume">Solution Volume (mL):</label>
+                <span id="mix-volume-val" class="stat-highlight">250mL</span>
+              </div>
+              <input type="range" id="mix-volume" min="50" max="1000" step="10" value="250">
             </div>
 
-            <div class="ligand-indicator glass-card">
-              <span class="label">Field Strength:</span>
-              <span id="field-strength-badge" class="badge sfl-badge">Strong Field Ligand (SFL)</span>
-              <p id="field-relation" class="small-text">Δₒ > P (Pairing Energy). Low Spin complex will form.</p>
-            </div>
-            
-            <div class="series-visual">
-              <h4>Spectrochemical Slider</h4>
-              <input type="range" id="series-slider" min="0" max="7" value="4">
-              <div class="slider-labels">
-                <span>I⁻ (Weak)</span>
-                <span>CO (Strong)</span>
+            <div class="control-group">
+              <div class="slider-label-row">
+                <label for="mix-temp">Temperature (°C):</label>
+                <span id="mix-temp-val" class="stat-highlight">25°C</span>
               </div>
+              <input type="range" id="mix-temp" min="5" max="80" step="1" value="25">
+            </div>
+
+            <div class="mixing-info glass-card">
+              <span class="label">Solvent (Water) Mass:</span>
+              <span id="mix-solvent-mass" class="badge-status">~ 242.0 g</span>
+              <p id="mix-density-note" class="small-text">Aqueous density varies with temperature and solute content. Pure H₂O = 1.00 g/mL (at 4°C).</p>
             </div>
           </div>
 
-          <!-- Splitting Visualization Column -->
+          <!-- Beaker Visualization Column -->
           <div class="glass-card lab-visualization">
-            <h3>d-Orbital Splitting Diagram</h3>
-            <div class="diagram-container">
-              
-              <!-- Octahedral Display -->
-              <div id="octahedral-diagram" class="splitting-diagram active">
-                <div class="energy-axis">
-                  <div class="axis-arrow">▲</div>
-                  <div class="axis-label">Energy</div>
+            <h3>Solute Dissolution Beaker</h3>
+            <div class="beaker-container">
+              <div class="beaker">
+                <div class="beaker-pour-spout"></div>
+                <div class="beaker-fill" id="beaker-fluid">
+                  <canvas id="beaker-particles-canvas"></canvas>
                 </div>
-
-                <!-- eg orbitals (higher) -->
-                <div class="level-container eg-level">
-                  <span class="level-lbl">e<sub>g</sub> (d<sub>x²-y²</sub>, d<sub>z²</sub>)</span>
-                  <div class="orbital-boxes">
-                    <div class="orbital-box" id="oct-eg-1"><div class="spin-electron up hidden">▲</div><div class="spin-electron down hidden">▼</div></div>
-                    <div class="orbital-box" id="oct-eg-2"><div class="spin-electron up hidden">▲</div><div class="spin-electron down hidden">▼</div></div>
-                  </div>
-                  <div class="energy-offset">+0.6 Δₒ</div>
-                </div>
-
-                <!-- Delta O Indicator -->
-                <div class="delta-gap">
-                  <div class="gap-arrow-up">▲</div>
-                  <div class="gap-label">Δ<sub>o</sub> (Splitting Energy)</div>
-                  <div class="gap-arrow-down">▼</div>
-                </div>
-
-                <!-- Barycenter -->
-                <div class="barycenter-line">
-                  <span>Barycenter (Average Energy)</span>
-                </div>
-
-                <!-- t2g orbitals (lower) -->
-                <div class="level-container t2g-level">
-                  <span class="level-lbl">t<sub>2g</sub> (d<sub>xy</sub>, d<sub>yz</sub>, d<sub>xz</sub>)</span>
-                  <div class="orbital-boxes">
-                    <div class="orbital-box" id="oct-t2g-1"><div class="spin-electron up hidden">▲</div><div class="spin-electron down hidden">▼</div></div>
-                    <div class="orbital-box" id="oct-t2g-2"><div class="spin-electron up hidden">▲</div><div class="spin-electron down hidden">▼</div></div>
-                    <div class="orbital-box" id="oct-t2g-3"><div class="spin-electron up hidden">▲</div><div class="spin-electron down hidden">▼</div></div>
-                  </div>
-                  <div class="energy-offset">-0.4 Δₒ</div>
+                <div class="beaker-scale">
+                  <span>1000ml</span>
+                  <span>750ml</span>
+                  <span>500ml</span>
+                  <span>250ml</span>
+                  <span>100ml</span>
                 </div>
               </div>
-
-              <!-- Tetrahedral Display (Initially Hidden) -->
-              <div id="tetrahedral-diagram" class="splitting-diagram">
-                <div class="energy-axis">
-                  <div class="axis-arrow">▲</div>
-                  <div class="axis-label">Energy</div>
-                </div>
-
-                <!-- t2 orbitals (higher) -->
-                <div class="level-container t2-level">
-                  <span class="level-lbl">t<sub>2</sub> (d<sub>xy</sub>, d<sub>yz</sub>, d<sub>xz</sub>)</span>
-                  <div class="orbital-boxes">
-                    <div class="orbital-box" id="tet-t2-1"><div class="spin-electron up hidden">▲</div><div class="spin-electron down hidden">▼</div></div>
-                    <div class="orbital-box" id="tet-t2-2"><div class="spin-electron up hidden">▲</div><div class="spin-electron down hidden">▼</div></div>
-                    <div class="orbital-box" id="tet-t2-3"><div class="spin-electron up hidden">▲</div><div class="spin-electron down hidden">▼</div></div>
-                  </div>
-                  <div class="energy-offset">+0.4 Δ<sub>t</sub></div>
-                </div>
-
-                <!-- Delta T Indicator -->
-                <div class="delta-gap">
-                  <div class="gap-arrow-up">▲</div>
-                  <div class="gap-label">Δ<sub>t</sub> ≈ 4/9 Δ<sub>o</sub></div>
-                  <div class="gap-arrow-down">▼</div>
-                </div>
-
-                <!-- Barycenter -->
-                <div class="barycenter-line">
-                  <span>Barycenter</span>
-                </div>
-
-                <!-- e orbitals (lower) -->
-                <div class="level-container e-level">
-                  <span class="level-lbl">e (d<sub>x²-y²</sub>, d<sub>z²</sub>)</span>
-                  <div class="orbital-boxes">
-                    <div class="orbital-box" id="tet-e-1"><div class="spin-electron up hidden">▲</div><div class="spin-electron down hidden">▼</div></div>
-                    <div class="orbital-box" id="tet-e-2"><div class="spin-electron up hidden">▲</div><div class="spin-electron down hidden">▼</div></div>
-                  </div>
-                  <div class="energy-offset">-0.6 Δ<sub>t</sub></div>
-                </div>
-              </div>
-
+            </div>
+            <div class="beaker-legend">
+              <span class="legend-item"><span class="legend-color water"></span> Water molecule</span>
+              <span class="legend-item"><span class="legend-color solute" id="legend-solute-color"></span> Solute particle</span>
             </div>
           </div>
 
-          <!-- Lab Results Column -->
+          <!-- Concentration Math Output Column -->
           <div class="glass-card lab-results">
-            <h3>Calculated Properties</h3>
+            <h3>Calculated Concentration Metrics</h3>
             
             <div class="result-item">
-              <span class="result-label">Electron Configuration:</span>
-              <span id="res-config" class="result-val code-font">t₂g⁶ eg⁰</span>
+              <span class="result-label">Molarity (M):</span>
+              <span id="res-molarity" class="result-val code-font">0.68 mol/L</span>
             </div>
 
             <div class="result-item">
-              <span class="result-label">Spin State:</span>
-              <span id="res-spin" class="result-val">Low Spin Complex</span>
+              <span class="result-label">Molality (m):</span>
+              <span id="res-molality" class="result-val code-font">0.71 mol/kg</span>
             </div>
 
             <div class="result-item">
-              <span class="result-label">Unpaired Electrons (n):</span>
-              <span id="res-unpaired" class="result-val">0</span>
+              <span class="result-label">Mole Fraction (Solute \(\chi_2\)):</span>
+              <span id="res-molefraction" class="result-val code-font">0.0126</span>
             </div>
 
             <div class="result-item">
-              <span class="result-label">Magnetic Moment (μ):</span>
-              <span id="res-magnetic" class="result-val">0.00 BM (Diamagnetic)</span>
+              <span class="result-label">Mass Percentage (w/w):</span>
+              <span id="res-masspercent" class="result-val code-font">3.98 %</span>
             </div>
 
-            <div class="result-item color-result">
-              <div class="color-details">
-                <span class="result-label">Estimated Color:</span>
-                <span id="res-color-name" class="result-val">Orange-Yellow</span>
-                <span id="res-absorb" class="small-text">Absorbs: Violet-Blue (~450 nm)</span>
-              </div>
-              <div id="color-preview-patch" class="color-patch"></div>
+            <div class="result-item">
+              <span class="result-label">Parts per Million (ppm):</span>
+              <span id="res-ppm" class="result-val code-font">39,840 ppm</span>
             </div>
 
             <div class="formula-output glass-card">
-              <h4>Representative Complex:</h4>
-              <div id="res-formula" class="code-font">[Fe(NH₃)₆]²⁺</div>
+              <h4>Preparation Recipe:</h4>
+              <div id="recipe-text" class="small-text">
+                Dissolve 10.0g of NaCl (0.17 moles) in approx 242.0g of water. Make up solution to 250mL.
+              </div>
             </div>
           </div>
         </div>
       </section>
 
       <!-- ========================================== -->
-      <!-- 4. LIGAND SORTER PANEL                     -->
+      <!-- 3. RAOULT'S LAW LAB PANEL                  -->
       <!-- ========================================== -->
-      <section id="ligand-sorter" class="tab-panel">
+      <section id="raoults-lab" class="tab-panel">
         <div class="glass-card game-header">
-          <h2>Ligand Sorter Game</h2>
-          <p>Classify the incoming ligand cards into the correct chemical categories based on their denticity and ambidentate nature. Be quick and precise!</p>
-          <div class="game-stats">
-            <div>Score: <span id="sort-score" class="stat-highlight">0</span></div>
-            <div>High Score: <span id="sort-highscore" class="stat-highlight">0</span></div>
-            <div>Time Left: <span id="sort-timer" class="stat-highlight">45s</span></div>
-          </div>
+          <h2>Raoult's Law & Deviation Simulator</h2>
+          <p>Simulate binary liquid mixtures. Alter the molecular interactions between Component A and Component B (A-B interactions) relative to self-interactions (A-A and B-B) to observe how vapor pressure curves warp.</p>
         </div>
 
-        <div class="sorter-game-container">
-          <!-- Game Play Area -->
-          <div id="sorter-active-screen" class="sorter-play-area">
-            <!-- Active Card Container -->
-            <div class="active-card-wrapper">
-              <div id="ligand-card" class="ligand-card-element">
-                <div class="ligand-symbol" id="card-symbol">en</div>
-                <div class="ligand-name" id="card-name">ethylenediamine</div>
-                <div class="ligand-hint">Click the correct bucket below!</div>
+        <div class="lab-layout">
+          <!-- Graph settings and details -->
+          <div class="glass-card lab-controls">
+            <h3>Molecular Forces</h3>
+            
+            <div class="control-group">
+              <label>Intermolecular Attractions:</label>
+              <div class="range-container">
+                <input type="range" id="force-slider" min="-5" max="5" step="1" value="0">
+                <div class="slider-labels">
+                  <span>Strong A-B</span>
+                  <span>Ideal</span>
+                  <span>Weak A-B</span>
+                </div>
               </div>
             </div>
 
-            <!-- Buckets Grid -->
-            <div class="buckets-grid">
-              <button class="bucket-btn" data-category="monodentate">
-                <div class="bucket-icon">💧</div>
-                <div class="bucket-title">Monodentate</div>
-                <div class="bucket-desc">1 Donor Atom (e.g. Cl⁻, NH₃)</div>
-              </button>
-              
-              <button class="bucket-btn" data-category="bidentate">
-                <div class="bucket-icon">🦀</div>
-                <div class="bucket-title">Bidentate</div>
-                <div class="bucket-desc">2 Donor Atoms (e.g. en, ox²⁻)</div>
-              </button>
+            <div class="interaction-status-card glass-card">
+              <h4 id="interaction-title">Ideal Solution</h4>
+              <p id="interaction-forces">A-B intermolecular forces are equivalent to A-A and B-B forces.</p>
+              <div class="deviation-badge" id="deviation-badge-val">Ideal (No Deviation)</div>
+            </div>
 
-              <button class="bucket-btn" data-category="polydentate">
-                <div class="bucket-icon">🐙</div>
-                <div class="bucket-title">Polydentate</div>
-                <div class="bucket-desc">&gt;2 Donor Atoms (e.g. EDTA⁴⁻)</div>
-              </button>
-
-              <button class="bucket-btn" data-category="ambidentate">
-                <div class="bucket-icon">🎭</div>
-                <div class="bucket-title">Ambidentate</div>
-                <div class="bucket-desc">Can coordinate via 2 different atoms (e.g. SCN⁻)</div>
-              </button>
+            <div class="chemical-examples glass-card">
+              <h4>NCERT Physical Mixtures:</h4>
+              <div id="chem-examples-list">
+                • Benzene + Toluene<br>
+                • n-Hexane + n-Heptane
+              </div>
+            </div>
+            
+            <div class="thermo-metrics glass-card">
+              <h4>Thermodynamic Conditions:</h4>
+              <div class="metric-row">
+                <span>\(\Delta H_{\text{mix}}\):</span>
+                <span id="thermo-h" class="code-font">= 0</span>
+              </div>
+              <div class="metric-row">
+                <span>\(\Delta V_{\text{mix}}\):</span>
+                <span id="thermo-v" class="code-font">= 0</span>
+              </div>
             </div>
           </div>
 
-          <!-- Start/Over Screen -->
-          <div id="sorter-start-screen" class="glass-card sorter-overlay-card">
-            <h3>Are you ready to classify?</h3>
-            <p>You have 45 seconds to sort as many ligands as possible. Incorrect placements deduct 2 seconds from the clock.</p>
-            <button id="sorter-start-btn" class="primary-btn btn-large">Start Sorting Game</button>
+          <!-- Vapor Pressure Diagram Graph -->
+          <div class="glass-card lab-visualization graph-panel">
+            <h3>Vapor Pressure vs. Mole Fraction Diagram</h3>
+            <div class="canvas-wrapper">
+              <canvas id="raoult-graph-canvas" width="500" height="400"></canvas>
+            </div>
+            <div class="graph-legend">
+              <span class="legend-item"><span class="legend-color a-vp"></span> \(p_A\) (Component A)</span>
+              <span class="legend-item"><span class="legend-color b-vp"></span> \(p_B\) (Component B)</span>
+              <span class="legend-item"><span class="legend-color total-vp"></span> \(P_{\text{total}}\) (Total)</span>
+            </div>
           </div>
 
-          <div id="sorter-end-screen" class="glass-card sorter-overlay-card hidden">
-            <h3>Time's Up!</h3>
-            <p>You sorted <strong id="final-sorted-count">0</strong> ligands successfully.</p>
-            <p>Accuracy: <strong id="sort-accuracy">0%</strong></p>
-            <button id="sorter-restart-btn" class="primary-btn btn-large">Play Again</button>
+          <!-- Educational Context sidebar -->
+          <div class="glass-card lab-results explanation-box-side">
+            <h3>Vapor Pressure Insight</h3>
+            <div class="explanation-content">
+              <p>At \(\chi_A = 1\), vapor pressure equals pure component pressure \(p_A^0 = 150\) mmHg.</p>
+              <p>At \(\chi_B = 1\), vapor pressure equals pure component pressure \(p_B^0 = 200\) mmHg.</p>
+              <div class="interaction-expl-card" id="interaction-mechanism-text">
+                Since cohesive and adhesive forces are identical, vapor pressures follow straight linear lines in compliance with Raoult's Law. Liquid molecules escape at a constant proportional rate.
+              </div>
+              <div class="azeotrope-warning hidden" id="azeotrope-warning-box">
+                <strong>Azeotropic Note:</strong> At this extremum deviation point, the liquid mixture forms an azeotrope. The liquid and vapor compositions are identical, meaning they boil constant like a pure compound.
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ========================================== -->
+      <!-- 4. COLLIGATIVE PROPERTIES LAB PANEL        -->
+      <!-- ========================================== -->
+      <section id="colligative-lab" class="tab-panel">
+        <div class="glass-card game-header">
+          <h2>Colligative Properties Lab</h2>
+          <p>Investigate the impact of solutes on physical phase points. Choose a solute type to observe how the van 't Hoff factor (\(i\)) amplifies temperature shifts and osmotic cell molecule flow.</p>
+        </div>
+
+        <div class="colligative-layout">
+          <!-- Controls Panel -->
+          <div class="glass-card colligative-controls">
+            <h3>Simulation Setup</h3>
+            
+            <div class="control-group">
+              <label for="coll-solute">Select Solute:</label>
+              <select id="coll-solute">
+                <option value="Glucose" selected>Glucose (Non-electrolyte, i = 1)</option>
+                <option value="NaCl">Sodium Chloride (Electrolyte, i = 2)</option>
+                <option value="CaCl2">Calcium Chloride (Electrolyte, i = 3)</option>
+              </select>
+            </div>
+
+            <div class="control-group">
+              <div class="slider-label-row">
+                <label for="coll-molality">Solute Molality (mol/kg):</label>
+                <span id="coll-molality-val" class="stat-highlight">1.0 mol/kg</span>
+              </div>
+              <input type="range" id="coll-molality" min="0.1" max="4.0" step="0.1" value="1">
+            </div>
+
+            <div class="properties-output glass-card">
+              <h4>Calculated Shifts (Water solvent):</h4>
+              <div class="shift-row">
+                <span>Freezing Point Depression (\(\Delta T_f\)):</span>
+                <span id="coll-dtf" class="stat-highlight">1.86 °C</span>
+              </div>
+              <div class="shift-row">
+                <span>New Freezing Point:</span>
+                <span id="coll-newtf" class="code-font">-1.86 °C</span>
+              </div>
+              <div class="shift-row">
+                <span>Boiling Point Elevation (\(\Delta T_b\)):</span>
+                <span id="coll-dtb" class="stat-highlight">0.52 °C</span>
+              </div>
+              <div class="shift-row">
+                <span>New Boiling Point:</span>
+                <span id="coll-newtb" class="code-font">100.52 °C</span>
+              </div>
+              <div class="shift-row font-special">
+                <span>van 't Hoff Factor (\(i\)):</span>
+                <span id="coll-i-factor" class="badge active-badge">1.00</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Graphical Interactive Tabs (Phase Diagram vs Osmosis Canvas) -->
+          <div class="glass-card visualizer-panel">
+            <div class="visualizer-tabs">
+              <button class="viz-tab-btn active" data-viz="osmosis">Osmosis Membrane Animation</button>
+              <button class="viz-tab-btn" data-viz="phasediagram">Phase Diagram Shift</button>
+            </div>
+
+            <div class="viz-content active" id="viz-osmosis">
+              <div class="osmosis-canvas-header">
+                <span class="chamber-lbl">Dilute Chamber (Pure Water)</span>
+                <span class="membrane-lbl">Semi-Permeable Membrane (SPM)</span>
+                <span class="chamber-lbl">Concentrated Chamber (Solution)</span>
+              </div>
+              <canvas id="osmosis-canvas" width="560" height="300"></canvas>
+              <div class="osmosis-controls">
+                <button class="primary-btn" id="btn-apply-pressure">Apply Osmotic Pressure (\(\Pi\))</button>
+                <div class="osmotic-metric-display">
+                  <span>Osmotic Pressure (\(\Pi\)): <strong id="val-osmotic-pressure">24.4 atm</strong></span>
+                </div>
+              </div>
+            </div>
+
+            <div class="viz-content" id="viz-phasediagram">
+              <canvas id="phasediagram-canvas" width="560" height="300"></canvas>
+              <div class="diagram-note">
+                <p>• Pure solvent curves are shown in solid blue. Solution curves are shown in dashed purple. Notice the vapor pressure depression shifts freezing point lower (\(T_f < T_f^0\)) and boiling point higher (\(T_b > T_b^0\)).</p>
+              </div>
+            </div>
           </div>
         </div>
       </section>
@@ -604,30 +614,40 @@
       <!-- 5. 25-QUESTION MASTERY QUIZ PANEL          -->
       <!-- ========================================== -->
       <section id="quiz" class="tab-panel">
-        <div class="glass-card game-header">
-          <h2>NCERT Class XII Mastery Quiz</h2>
-          <p>Test your knowledge with exactly 25 multiple-choice questions covering double salts, Werner's postulates, nomenclature, isomerism, VBT, CFT, metal carbonyls, and applications.</p>
-          <div class="quiz-progress-info">
-            <div>Question <span id="quiz-q-num">1</span> of 25</div>
-            <div>Score: <span id="quiz-score">0</span>/25</div>
+        <!-- Start screen for entering name -->
+        <div id="quiz-start-screen" class="glass-card quiz-start-card">
+          <div class="quiz-badge-icon">🎓</div>
+          <h2>Class XII NCERT Certification Exam</h2>
+          <p>Prepare to test your mastery of physical chemistry Solutions. Complete this 25-question comprehensive test to earn your custom personalized Certificate of Achievement.</p>
+          
+          <div class="name-entry-form">
+            <label for="student-name">Enter Student Name (for Certificate):</label>
+            <input type="text" id="student-name" placeholder="John Doe" maxlength="40">
+            <span class="error-msg hidden" id="name-error-msg">Please enter a valid name to proceed!</span>
           </div>
-          <div class="quiz-progress-bar-container">
-            <div class="quiz-progress-bar-fill" id="quiz-progress-bar"></div>
-          </div>
+
+          <button id="quiz-start-btn" class="primary-btn btn-large">Begin Certification Quiz</button>
         </div>
 
-        <div class="quiz-container">
-          <!-- Question Card -->
-          <div class="glass-card question-card" id="quiz-question-screen">
+        <!-- Question View (Initially Hidden) -->
+        <div id="quiz-question-screen" class="glass-card question-card-outer hidden">
+          <div class="quiz-panel-header">
+            <div class="quiz-progress-info">
+              <div>Question <span id="quiz-q-num">1</span> of 25</div>
+              <div>Score: <span id="quiz-score">0</span> / 25</div>
+            </div>
+            <div class="quiz-progress-bar-container">
+              <div class="quiz-progress-bar-fill" id="quiz-progress-bar"></div>
+            </div>
+          </div>
+
+          <div class="question-container">
             <div id="question-text" class="question-title">
-              What is the hybridization and magnetic behavior of the complex [CoF₆]³⁻ according to Valence Bond Theory?
+              Question text goes here...
             </div>
             
             <div class="options-container" id="quiz-options">
-              <button class="option-btn">A. d²sp³ and paramagnetic</button>
-              <button class="option-btn">B. sp³d² and paramagnetic</button>
-              <button class="option-btn">C. d²sp³ and diamagnetic</button>
-              <button class="option-btn">D. sp³d² and diamagnetic</button>
+              <!-- Dynamically populated options buttons -->
             </div>
 
             <!-- Feedback card initially hidden -->
@@ -639,36 +659,36 @@
               <button id="quiz-next-btn" class="primary-btn">Next Question</button>
             </div>
           </div>
+        </div>
 
-          <!-- Quiz Summary Card (Initially Hidden) -->
-          <div class="glass-card quiz-results-card hidden" id="quiz-summary-screen">
-            <div class="result-graphic">🏆</div>
-            <h2>Quiz Completed!</h2>
-            <div class="result-stats">
-              <div class="res-stat-item">
-                <span class="lbl">Final Score</span>
-                <span class="val" id="summary-score">18 / 25</span>
-              </div>
-              <div class="res-stat-item">
-                <span class="lbl">Accuracy</span>
-                <span class="val" id="summary-accuracy">72%</span>
-              </div>
-              <div class="res-stat-item">
-                <span class="lbl">Grade</span>
-                <span class="val" id="summary-grade">Excellent</span>
-              </div>
+        <!-- Quiz Summary / Certificate View (Initially Hidden) -->
+        <div id="quiz-summary-screen" class="glass-card quiz-results-card hidden">
+          <div class="result-graphic">🏆</div>
+          <h2>Certification Accomplished!</h2>
+          <div class="result-stats">
+            <div class="res-stat-item">
+              <span class="lbl">Final Score</span>
+              <span class="val" id="summary-score">0 / 25</span>
             </div>
-
-            <div class="certificate-container glass-card">
-              <h3>Your Achievement Certificate</h3>
-              <p>You have demonstrated solid mastery of NCERT Class XII Coordination Compounds.</p>
-              <canvas id="certificate-canvas" width="600" height="400" style="display:none;"></canvas>
-              <img id="certificate-image" alt="Coordination Chemistry Certificate" class="cert-img">
-              <button id="download-cert-btn" class="primary-btn">Download Certificate</button>
+            <div class="res-stat-item">
+              <span class="lbl">Accuracy</span>
+              <span class="val" id="summary-accuracy">0%</span>
             </div>
-
-            <button id="quiz-restart-btn" class="secondary-btn btn-large">Retake Quiz</button>
+            <div class="res-stat-item">
+              <span class="lbl">Academic Grade</span>
+              <span class="val" id="summary-grade">Excellent</span>
+            </div>
           </div>
+
+          <div class="certificate-container glass-card">
+            <h3>Your Certificate of Achievement</h3>
+            <p>You have demonstrated solid conceptual mastery of NCERT Class XII Solutions.</p>
+            <canvas id="certificate-canvas" width="800" height="550" style="display:none;"></canvas>
+            <img id="certificate-image" alt="Solutions Chemistry Certificate" class="cert-img">
+            <button id="download-cert-btn" class="primary-btn btn-glow">Download Certificate (PNG)</button>
+          </div>
+
+          <button id="quiz-restart-btn" class="secondary-btn btn-large">Retake Examination</button>
         </div>
       </section>
 
